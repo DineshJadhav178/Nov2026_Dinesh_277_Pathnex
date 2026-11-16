@@ -1,0 +1,172 @@
+
+# Day 01 - Linux Fundamentals & Basic Commands
+
+## 1. Basic Linux Commands
+
+Q1. Display the current working directory.
+Command:
+pwd
+
+Q2. List all files, including hidden files.
+Command:
+ls -la
+
+Q3. Create a directory named devops.
+Command:
+mkdir devops
+
+Q4. Create multiple directories in one command.
+Command:
+mkdir linux git docker aws
+
+Q5. Create an empty file named test.txt.
+Command:
+touch test.txt
+
+Q6. Display the content of a file.
+Command:
+cat test.txt
+
+Q7. Display the first 10 lines of a file.
+Command:
+head -10 test.txt
+
+Q8. Display the last 10 lines of a file.
+Command:
+tail -10 test.txt
+
+## 2. File and Directory Management
+
+Q9. Copy a file.
+Command:
+cp test.txt backup.txt
+
+Q10. Rename a file.
+Command:
+mv backup.txt old_backup.txt
+
+Q11. Move a file into another directory.
+Command:
+mv test.txt devops/
+
+Q12. Delete a file.
+Command:
+rm old_backup.txt
+
+Q13. Delete an empty directory.
+Command:
+rmdir devops
+
+Q14. Find all .txt files.
+Command:
+find . -name "*.txt"
+
+## 3. Linux Permissions
+
+Q15. Check file permissions.
+Command:
+ls -l
+
+Q16. Give owner full permissions and others read and execute permissions.
+Command:
+chmod 755 script.sh
+
+Q17. Give owner read/write and others read-only permissions.
+Command:
+chmod 644 test.txt
+
+Q18. Change file ownership.
+Command:
+sudo chown username test.txt
+
+Q19. Understand permission values.
+7 = Read + Write + Execute
+6 = Read + Write
+5 = Read + Execute
+4 = Read only
+
+## 4. User and Group Management
+
+Q20. Check current logged-in user.
+Command:
+whoami
+
+Q21. Display user ID and group ID.
+Command:
+id
+
+Q22. Display currently logged-in users.
+Command:
+who
+
+Q23. Display groups of current user.
+Command:
+groups
+
+## 5. System Information
+
+Q24. Display Linux kernel information.
+Command:
+uname -a
+
+Q25. Display hostname.
+Command:
+hostname
+
+Q26. Check system uptime.
+Command:
+uptime
+
+Q27. Display system date and time.
+Command:
+date
+
+## 6. Practical Tasks
+
+Task 1:
+Create a directory named sre-practice.
+
+Task 2:
+Inside sre-practice, create three directories:
+linux, scripts, logs.
+
+Task 3:
+Inside scripts, create a file named monitor.sh.
+
+Task 4:
+Write "Linux monitoring practice" inside monitor.sh.
+
+Task 5:
+Display the file content.
+
+Task 6:
+Set permissions to 755 for monitor.sh.
+
+Task 7:
+Verify permissions using ls -l.
+
+Task 8:
+Find all .sh files inside sre-practice.
+
+## 7. Linux Interview Questions
+
+1. What is Linux?
+2. What is the Linux kernel?
+3. What is the difference between Linux and Unix?
+4. What is the difference between absolute and relative paths?
+5. What is the difference between cat, less and more?
+6. What is the difference between cp and mv?
+7. Explain chmod 755 and chmod 644.
+8. What is the difference between root and a normal user?
+9. What is the purpose of the sudo command?
+10. What is the difference between rm and rmdir?
+
+## Learning Outcome
+
+- Understand basic Linux commands.
+- Manage files and directories.
+- Understand Linux permissions.
+- Learn basic user management.
+- Check Linux system information.
+- Perform basic Linux administration tasks.
+
