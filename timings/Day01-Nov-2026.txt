@@ -1,0 +1,164 @@
+Use the following as your actual **Day 01 Linux & DevOps practice log**. It focuses on Linux fundamentals, commands, file management, permissions, processes, networking and Git basics.
+
+### **1. Timings file**
+
+File: `timings/Day01-16-Nov-2026.txt`
+
+# Day 01 – Linux Fundamentals & DevOps Practice
+
+## What I did today:
+
+1. 1 hour – Linux fundamentals: Linux architecture, kernel, shell, terminal and distributions.
+2. 1 hour – Basic Linux commands: `pwd`, `ls`, `cd`, `mkdir`, `touch`, `cat`, `less`, `clear`.
+3. 1 hour – File and directory management: `cp`, `mv`, `rm`, `find`, `locate`, `tree`.
+4. 1 hour – Linux file permissions: `chmod`, `chown`, `chgrp`, read, write and execute permissions.
+5. 30 minutes – Linux user and group management: `whoami`, `id`, `who`, `groups`, `useradd`, `passwd`.
+6. 30 minutes – Git fundamentals: repository initialization, branches, add, commit and push.
+
+## Tomorrow's Tasks:
+
+1. Learn Linux file permission concepts with practical examples.
+2. Practice Linux process management: `ps`, `top`, `htop`, `kill`, `pkill`.
+3. Understand Linux package management using `apt`.
+4. Practice disk and memory commands: `df`, `du`, `free`, `lsblk`.
+5. Learn Linux networking basics: `ip`, `ping`, `ss`, `curl`, `wget`.
+6. Practice 10 Linux interview questions.
+
+### **2. Coding practice file**
+
+File: `coding practice/Day01-16-Nov-2026.txt`
+
+# Day 01 – Linux Command Practice
+
+## Practical Exercises
+
+### 1. Current Working Directory
+
+```
+pwd
+```
+
+### 2. List Files and Directories
+
+```
+ls
+ls -l
+ls -la
+```
+
+### 3. Create Directories
+
+```
+mkdir linux-practice
+mkdir -p linux-practice/day01
+```
+
+### 4. Create Files
+
+```
+touch file1.txt file2.txt
+```
+
+### 5. Write Content into a File
+
+```
+echo "Learning Linux fundamentals" > file1.txt
+cat file1.txt
+```
+
+### 6. Copy Files
+
+```
+cp file1.txt file2.txt
+```
+
+### 7. Rename Files
+
+```
+mv file2.txt backup.txt
+```
+
+### 8. Search for Files
+
+```
+find . -name "*.txt"
+```
+
+### 9. Check File Permissions
+
+```
+ls -l
+```
+
+### 10. Change File Permissions
+
+```
+chmod 755 file1.txt
+chmod 644 backup.txt
+```
+
+### 11. Check Current User
+
+```
+whoami
+id
+groups
+```
+
+### 12. Check Linux System Information
+
+```
+uname -a
+hostname
+uptime
+```
+
+## Practice Questions
+
+1. What is Linux?
+2. What is the difference between Linux kernel and shell?
+3. What is the difference between absolute and relative paths?
+4. What is the difference between `cp` and `mv`?
+5. What is the purpose of the `chmod` command?
+6. Explain Linux file permissions: 755 and 644.
+7. What is the difference between `rm` and `rmdir`?
+8. What is the purpose of the `find` command?
+9. What is the difference between `sudo` and root user?
+10. What happens when we execute the `pwd` command?
+
+## Expected Learning Outcome
+
+- Understand basic Linux commands.
+- Navigate the Linux filesystem.
+- Create, copy, move and delete files.
+- Understand basic file permissions.
+- Identify users and groups.
+- Execute basic Linux commands confidently.
+
+### **3. Tomorrow's practical commands**
+
+```
+# Process management
+ps -ef
+top
+kill -9 PID
+pgrep ssh
+
+# Memory and disk
+free -h
+df -h
+du -sh *
+lsblk
+
+# Networking
+ip addr
+ping -c 4 google.com
+ss -tulnp
+curl -I https://google.com
+wget https://example.com
+
+# Package management
+sudo apt update
+apt list --installed
+sudo apt install tree -y
+
