@@ -1,0 +1,43 @@
+# Day 01 – Python Coding Practice
+
+## Topic 1: Python Fundamentals
+1. Find the largest number in a list.
+2. Reverse a string without using built-in reverse methods.
+3. Count the frequency of each character in a string.
+4. Remove duplicate elements from a list.
+5. Find the second-largest number in a list.
+
+## Topic 2: Linux Automation Using Python
+1. Write a script to check whether a particular file exists.
+2. Write a script to identify files larger than 100 MB.
+3. Write a script to check disk utilization.
+4. Read a Linux log file and count ERROR and WARNING entries.
+5. Display the top 5 largest files in a directory.
+
+## Topic 3: SRE Automation Scenarios
+1. Write a script to check whether a service is running.
+2. Create a script to monitor CPU utilization.
+3. Parse application logs and extract ERROR messages.
+4. Check whether a URL returns HTTP status code 200.
+5. Generate a report containing the last 24 hours of application errors.
+
+## Topic 4: Linux Command Practice
+
+Practice these commands:
+
+- `ps aux`
+- `top`
+- `free -h`
+- `df -h`
+- `du -sh`
+- `find`
+- `grep`
+- `awk`
+- `sed`
+- `journalctl`
+- `systemctl`
+- `ss -tulnp`
+- `lsof`
+- `chmod`
+- `chown`
+
