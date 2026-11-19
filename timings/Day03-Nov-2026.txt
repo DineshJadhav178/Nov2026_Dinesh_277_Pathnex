@@ -1,0 +1,86 @@
+# Day 03 – Git & GitHub Practice
+
+## What I Did Today
+
+1. **1 Hour – Git Fundamentals**
+   - Revised Git architecture and basic commands.
+   - Practiced `git init`, `git status`, `git add`, and `git commit`.
+   - Understood Git working directory, staging area and repository.
+
+2. **1 Hour – Git Branching & Merging**
+   - Practiced branch creation, switching and deletion.
+   - Worked with `git checkout`, `git switch` and `git merge`.
+   - Understood merge conflicts and their resolution.
+
+3. **1 Hour – GitHub Hands-on**
+   - Created and managed a GitHub repository.
+   - Connected local repository with GitHub using remote URL.
+   - Practiced `git push`, `git pull` and `git fetch`.
+
+4. **1 Hour – Pull Request Workflow**
+   - Created feature branches for daily practice.
+   - Pushed changes to GitHub.
+   - Created Pull Requests, reviewed changes and merged branches.
+   - Practiced branch deletion after merging.
+
+5. **30 Minutes – Git Troubleshooting**
+   - Practiced checking Git status and commit history.
+   - Understood rejected pushes and merge conflicts.
+   - Revised remote tracking branches.
+
+6. **30 Minutes – English Communication**
+   - Practiced explaining Git workflow and GitHub collaboration.
+   - Revised technical terminology
+Tomorrow's Tasks
+
+1 Hour – Advanced Git
+
+Practice git rebase, git cherry-pick and git stash.
+
+Understand git reset vs git revert.
+
+Practice resolving merge conflicts.
+
+1 Hour – GitHub Advanced
+
+Explore GitHub Actions and workflow YAML.
+
+Understand branch protection rules.
+
+Practice reviewing Pull Requests.
+
+1 Hour – CI/CD Fundamentals
+
+Understand CI/CD pipeline stages.
+
+Explore Jenkins and GitHub Actions integration.
+
+Understand automated build and deployment workflows.
+
+1 Hour – Python Coding
+
+Practice 3–5 Python problems.
+
+Write one basic automation script.
+
+1 Hour – SRE Interview Preparation
+
+Practice Git and GitHub interview questions.
+
+Explain branching strategies and PR workflows.
+
+Prepare real-world Git troubleshooting scenarios.
+
+30 Minutes – English Communication
+
+Explain the complete Git-to-GitHub workflow in English.
+
+Daily Target
+
+Strengthen Git version control fundamentals.
+
+Gain confidence in GitHub collaboration and PR workflows.
+
+Understand CI/CD integration.
+
+Practice real-world DevOps workflows.

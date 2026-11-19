@@ -1,0 +1,77 @@
+# Day 03 – Git & GitHub Coding Practice
+
+## 1. Git Fundamentals – Command Practice
+
+1. Initialize a new Git repository using `git init`.
+2. Check repository status using `git status`.
+3. Stage files using `git add`.
+4. Commit changes with meaningful commit messages.
+5. View commit history using `git log`.
+6. Configure Git username and email.
+7. Connect a local repository to GitHub using `git remote add origin`.
+8. Push local changes to GitHub.
+
+## 2. Git Branching & Merging
+
+1. Create a new branch named `feature-login`.
+2. Switch between `main` and feature branches.
+3. Create and merge a feature branch into `main`.
+4. Rename a branch using `git branch -m`.
+5. Delete a local branch.
+6. Delete a remote branch.
+7. Practice resolving a merge conflict.
+8. Compare two branches using `git diff`.
+
+## 3. GitHub Pull Request – Hands-on
+
+1. Create a new GitHub repository.
+2. Clone the repository into your local machine.
+3. Create a feature branch.
+4. Add and modify files.
+5. Commit and push changes.
+6. Create a Pull Request on GitHub.
+7. Review changed files and commit history.
+8. Merge the Pull Request.
+9. Delete the feature branch after merging.
+
+## 4. Advanced Git Commands
+
+Practice the following commands with practical examples:
+
+1. `git stash` – Temporarily save uncommitted changes.
+2. `git stash pop` – Restore stashed changes.
+3. `git rebase` – Reapply commits on another branch.
+4. `git cherry-pick` – Apply a specific commit.
+5. `git reset` – Move the current branch pointer.
+6. `git revert` – Create a commit that reverses previous changes.
+7. `git fetch` – Download remote updates.
+8. `git pull` – Fetch and integrate remote changes.
+
+## 5. Real-Time DevOps Scenarios
+
+1. A developer accidentally commits changes to the main branch. How would you handle it?
+2. Your Git push is rejected because the remote branch contains new commits. Troubleshoot it.
+3. Two developers modify the same file. Resolve the merge conflict.
+4. You committed a sensitive configuration file accidentally. Explain how to handle it securely.
+5. A feature branch is behind the main branch. How would you update it?
+6. You need to restore an earlier version of a file. Which Git commands would you use?
+7. A commit was pushed with incorrect changes. Explain how to revert it safely.
+
+## 6. GitHub Actions – Basic Practice
+
+1. Create a `.github/workflows` directory.
+2. Create a basic workflow YAML file.
+3. Configure a workflow to trigger on every push.
+4. Add checkout and basic shell execution steps.
+5. Understand workflow, jobs, runners and steps.
+6. Check workflow execution logs on GitHub Actions.
+
+## Daily Completion Target
+
+- [ ] Practice 10 basic Git commands.
+- [ ] Complete 5 branching and merging exercises.
+- [ ] Create and merge 1 Pull Request.
+- [ ] Practice 2 Git troubleshooting scenarios.
+- [ ] Create 1 basic GitHub Actions workflow.
+- [ ] Push all completed practice files to GitHub.
+
