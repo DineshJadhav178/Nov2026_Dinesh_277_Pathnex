@@ -1,0 +1,65 @@
+# Day 10 – Terraform Fundamentals Session Timing Log
+
+## What I Studied Today
+
+1. **1 Hour – Introduction to Terraform and Infrastructure as Code**
+   - Understanding Infrastructure as Code (IaC).
+   - What is Terraform and why it is used.
+   - Declarative vs Imperative approach.
+   - Understanding HashiCorp Configuration Language (HCL).
+   - Terraform architecture and workflow.
+   - Understanding Providers, Resources, Modules and State.
+
+2. **1 Hour – Terraform Installation and AWS Provider Configuration**
+   - Installing Terraform on Ubuntu/WSL.
+   - Verifying Terraform installation.
+   - Understanding AWS CLI configuration.
+   - Configuring AWS Provider.
+   - Understanding AWS credentials and authentication.
+   - Connecting Terraform with AWS.
+
+3. **1 Hour – Terraform Configuration and EC2 Resource Creation**
+   - Understanding Terraform configuration files.
+   - Writing provider.tf and main.tf.
+   - Creating an AWS EC2 resource.
+   - Understanding resource types and resource names.
+   - Configuring AMI, instance type and tags.
+   - Understanding terraform init and provider plugins.
+
+4. **1 Hour – Terraform Commands and Execution Workflow**
+   - terraform init
+   - terraform fmt
+   - terraform validate
+   - terraform plan
+   - terraform apply
+   - terraform destroy
+   - Understanding Terraform execution and dependency workflow.
+
+5. **1 Hour – Terraform Variables and Outputs**
+   - Understanding input variables.
+   - Creating variables.tf.
+   - Using variable references in resources.
+   - Understanding default values and variable types.
+   - Creating outputs.tf.
+   - Displaying EC2 public IP and instance ID.
+
+6. **1 Hour – Terraform State Management**
+   - Understanding terraform.tfstate.
+   - How Terraform tracks infrastructure.
+   - Understanding desired state vs actual state.
+   - terraform state list.
+   - terraform state show.
+   - Understanding state drift and state file security.
+
+## Tomorrow's Tasks
+
+1. Practice Terraform variables and outputs.
+2. Create EC2 infrastructure using reusable configuration.
+3. Practice Terraform state commands.
+4. Understand Terraform dependency management.
+5. Learn Terraform modules and reusable infrastructure.
+6. Practice remote state storage using AWS S3.
+7. Understand Terraform lifecycle rules.
+8. Spend 1 hour on Python coding.
+9. Practice SRE/DevOps interview questions.
+10. Continue English communication practice.
