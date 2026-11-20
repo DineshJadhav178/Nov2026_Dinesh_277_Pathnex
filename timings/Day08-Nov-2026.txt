@@ -1,0 +1,57 @@
+# Day 08 – Advanced Kubernetes Session Timing Log
+
+## What I Studied Today
+
+1. **1 Hour – Kubernetes Security and Pod Security**
+   - Security Context: `runAsUser`, `runAsGroup`, `fsGroup`
+   - Running containers as non-root users
+   - Linux capabilities and privilege escalation
+   - Pod Security Standards: Privileged, Baseline and Restricted
+   - Read-only root filesystem
+
+2. **1 Hour – Kubernetes Cluster Backup and Disaster Recovery**
+   - Understanding etcd and its importance
+   - etcd snapshots and backup concepts
+   - Restore process and disaster recovery
+   - Understanding RPO and RTO
+   - Backup strategies using Velero
+
+3. **1 Hour – Kubernetes Cluster Upgrade and Maintenance**
+   - Kubernetes version compatibility
+   - Control plane and worker node upgrades
+   - Upgrade planning and pre-checks
+   - Node draining and workload rescheduling
+   - Post-upgrade validation
+
+4. **1 Hour – Advanced Kubernetes Storage**
+   - Container Storage Interface (CSI)
+   - Persistent Volumes and Persistent Volume Claims
+   - Storage Classes and dynamic provisioning
+   - Volume snapshots and restore concepts
+   - Understanding access modes and reclaim policies
+
+5. **1 Hour – Admission Controllers and Kubernetes Policies**
+   - Understanding admission controllers
+   - Mutating vs Validating Admission Webhooks
+   - ResourceQuota and LimitRange
+   - Enforcing workload security policies
+   - Policy tools overview: Kyverno and OPA Gatekeeper
+
+6. **1 Hour – Advanced Troubleshooting and Production Scenarios**
+   - Kubernetes DNS troubleshooting
+   - ImagePullBackOff and container startup failures
+   - PVC Pending and mount failures
+   - Node NotReady scenarios
+   - Cluster upgrade and etcd-related incidents
+
+## Tomorrow's Tasks
+
+1. Practice Kubernetes Security Context and Pod Security Standards.
+2. Perform hands-on Persistent Volume and Storage Class exercises.
+3. Practice ResourceQuota and LimitRange YAML configurations.
+4. Understand Kubernetes admission webhooks and policy enforcement.
+5. Practice Kubernetes DNS and storage troubleshooting.
+6. Revise etcd backup, restore and cluster upgrade concepts.
+7. Complete 1 hour of Python coding.
+8. Practice SRE scenario-based interview questions.
+9. Spend time on English communication and technical explanation.

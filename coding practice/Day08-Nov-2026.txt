@@ -1,0 +1,388 @@
+# Day 08 – Advanced Kubernetes Coding Practice
+
+## 1. Kubernetes Security Context
+
+**Objective:** Run containers with restricted permissions and understand container-level security.
+
+Tasks:
+
+- Create a Pod using a non-root user.
+- Configure `runAsUser` and `runAsGroup`.
+- Configure `fsGroup`.
+- Enable read-only root filesystem.
+- Disable privilege escalation.
+- Verify the container's user.
+
+Create `security-pod.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-nginx
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+    runAsGroup: 101
+    fsGroup: 101
+  containers:
+    - name: nginx
+      image: nginxinc/nginx-unprivileged:stable
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+```
+
+Commands:
+
+```bash
+kubectl apply -f security-pod.yaml
+kubectl get pods
+kubectl describe pod secure-nginx
+kubectl exec secure-nginx -- id
+```
+
+**Important:** A read-only root filesystem may require writable mounted volumes for application temporary files. Understand why a container might fail when it tries to write to its filesystem.
+
+## 2. Pod Security Standards
+
+Understand the three security levels:
+
+- Privileged: Minimal restrictions.
+- Baseline: Prevents known privilege escalations.
+- Restricted: Applies stronger security requirements.
+
+Tasks:
+
+```bash
+kubectl create namespace secure-app
+kubectl label namespace secure-app \
+  pod-security.kubernetes.io/enforce=restricted
+kubectl get namespace secure-app --show-labels
+```
+
+Try deploying a non-compliant Pod and observe the rejection.
+
+**Interview question:** What is the difference between Security Context and Pod Security Standards?
+
+## 3. Kubernetes ResourceQuota
+
+**Objective:** Control the resource consumption of a namespace.
+
+Create `resource-quota.yaml`:
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: app-quota
+  namespace: secure-app
+spec:
+  hard:
+    pods: "10"
+    requests.cpu: "2"
+    requests.memory: 2Gi
+    limits.cpu: "4"
+    limits.memory: 4Gi
+```
+
+Commands:
+
+```bash
+kubectl apply -f resource-quota.yaml
+kubectl describe resourcequota -n secure-app
+kubectl get resourcequota -n secure-app
+```
+
+Tasks:
+
+- Create multiple Pods in the namespace.
+- Observe quota usage.
+- Try exceeding the configured limits.
+- Understand why Kubernetes rejects additional resource requests.
+
+## 4. Kubernetes LimitRange
+
+**Objective:** Set default and maximum resource limits for containers.
+
+Create `limit-range.yaml`:
+
+```yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: app-limits
+  namespace: secure-app
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      max:
+        cpu: "1"
+        memory: "1Gi"
+      min:
+        cpu: "100m"
+        memory: "128Mi"
+```
+
+Commands:
+
+```bash
+kubectl apply -f limit-range.yaml
+kubectl describe limitrange -n secure-app
+```
+
+Tasks:
+
+- Create a Pod without resource requests and limits.
+- Inspect the automatically assigned defaults.
+- Try creating a Pod that exceeds the maximum values.
+
+## 5. Advanced Kubernetes Storage – StorageClass and PVC
+
+**Objective:** Understand dynamic volume provisioning.
+
+First, inspect the available storage classes:
+
+```bash
+kubectl get storageclass
+kubectl get pv
+kubectl get pvc -A
+```
+
+Create `storage-pvc.yaml`:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: YOUR_STORAGE_CLASS
+```
+
+Replace `YOUR_STORAGE_CLASS` with an existing StorageClass in your cluster.
+
+Commands:
+
+```bash
+kubectl apply -f storage-pvc.yaml
+kubectl get pvc
+kubectl describe pvc app-storage
+kubectl get pv
+```
+
+Tasks:
+
+- Understand dynamic provisioning.
+- Check PVC binding status.
+- Attach the PVC to a Pod.
+- Write a file into the mounted volume.
+- Delete and recreate the Pod and verify persistence.
+
+**Important:** A StorageClass and suitable storage provisioner must exist. For EKS, understand the EBS CSI driver and its permissions.
+
+## 6. Volume Snapshots
+
+Understand how Kubernetes volume snapshots support backup and recovery.
+
+Tasks:
+
+- Learn VolumeSnapshot and VolumeSnapshotClass.
+- Check whether the CSI driver supports snapshots.
+- Create a VolumeSnapshot from a PVC.
+- Understand how to restore a PVC from a snapshot.
+
+Commands:
+
+```bash
+kubectl get volumesnapshotclass
+kubectl get volumesnapshot -A
+```
+
+**Note:** Snapshot resources require a compatible CSI driver and snapshot controller. Do not assume they are available in every cluster.
+
+## 7. Kubernetes Admission Controllers
+
+**Objective:** Understand how Kubernetes validates or modifies API requests.
+
+Learn:
+
+- Mutating Admission Webhooks
+- Validating Admission Webhooks
+- Built-in admission controllers
+- Kyverno
+- OPA Gatekeeper
+
+Tasks:
+
+- Understand the API request lifecycle.
+- Learn how a policy can block privileged containers.
+- Understand how a mutating webhook can add default labels.
+- Review a simple Kyverno policy that rejects Pods running as root.
+
+**Interview question:** What happens when a Pod creation request reaches the Kubernetes API Server?
+
+## 8. Kubernetes Cluster Backup and etcd
+
+**Objective:** Understand how cluster state is protected.
+
+Learn:
+
+- What data etcd stores.
+- Why etcd backup is important.
+- Snapshot and restore concepts.
+- Backup validation.
+- Velero and Kubernetes resource backups.
+
+For a self-managed control plane, explore:
+
+```bash
+kubectl get pods -n kube-system
+kubectl get endpoints -n default
+```
+
+If you have access to a control-plane node, study the etcd snapshot workflow:
+
+```bash
+ETCDCTL_API=3 etcdctl snapshot save snapshot.db
+ETCDCTL_API=3 etcdctl snapshot status snapshot.db
+```
+
+**Important:** These etcd commands require access to the etcd endpoint, valid certificates and appropriate permissions. They are not normally executed from an ordinary application Pod or a managed EKS worker node.
+
+## 9. Kubernetes Cluster Upgrade
+
+**Objective:** Understand the production upgrade workflow.
+
+Study the following sequence:
+
+1. Check current Kubernetes version.
+2. Review release notes and version compatibility.
+3. Check cluster health and workloads.
+4. Back up important cluster data.
+5. Upgrade the control plane.
+6. Upgrade worker nodes.
+7. Drain and upgrade nodes safely.
+8. Validate workloads and services.
+
+Commands:
+
+```bash
+kubectl version
+kubectl get nodes
+kubectl get pods -A
+kubectl get deployments -A
+kubectl get events -A --sort-by=.metadata.creationTimestamp
+```
+
+For EKS, study the managed control plane upgrade process and managed node group updates separately.
+
+## 10. Kubernetes DNS Troubleshooting
+
+**Objective:** Troubleshoot service discovery issues.
+
+Commands:
+
+```bash
+kubectl get pods -n kube-system
+kubectl get services -n kube-system
+kubectl logs -n kube-system -l k8s-app=kube-dns
+```
+
+Run a DNS test Pod:
+
+```bash
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  --restart=Never \
+  --command -- sleep 3600
+```
+
+Test DNS resolution:
+
+```bash
+kubectl exec dns-test -- nslookup kubernetes.default
+kubectl exec dns-test -- nslookup YOUR_SERVICE.YOUR_NAMESPACE.svc.cluster.local
+```
+
+Tasks:
+
+- Understand CoreDNS.
+- Check DNS resolution from a Pod.
+- Troubleshoot service name resolution failures.
+- Understand how DNS issues can affect microservices.
+
+## 11. Production-Level SRE Troubleshooting Scenarios
+
+Practice explaining the investigation and resolution approach for these incidents:
+
+**Scenario 1: PVC is stuck in Pending**
+
+- Check PVC and StorageClass.
+- Inspect events.
+- Verify CSI provisioner health.
+- Check storage permissions and availability.
+
+**Scenario 2: Pods are failing after a security policy change**
+
+- Check Pod events.
+- Review Pod Security Standards.
+- Inspect Security Context.
+- Identify the restricted permission.
+- Apply the approved security configuration.
+
+**Scenario 3: Application cannot communicate with another service**
+
+- Check Pod status and endpoints.
+- Verify Service selectors.
+- Test DNS resolution.
+- Inspect NetworkPolicy rules.
+- Review application logs.
+
+**Scenario 4: Kubernetes node upgrade caused application downtime**
+
+- Check node status and Pod distribution.
+- Review drain and eviction events.
+- Inspect Pod Disruption Budgets.
+- Verify replica availability.
+- Validate application health after the upgrade.
+
+**Scenario 5: Kubernetes cluster state needs recovery**
+
+- Identify the backup source.
+- Validate snapshot integrity.
+- Understand etcd restoration requirements.
+- Follow the cluster-specific recovery procedure.
+- Verify API Server and workload health.
+
+## 12. Daily Completion Checklist
+
+- [ ] Practiced Security Context.
+- [ ] Understood Pod Security Standards.
+- [ ] Created ResourceQuota and LimitRange.
+- [ ] Practiced StorageClass and PVC.
+- [ ] Studied VolumeSnapshots.
+- [ ] Understood Admission Controllers.
+- [ ] Studied etcd backup and restore.
+- [ ] Revised cluster upgrade workflow.
+- [ ] Practiced Kubernetes DNS troubleshooting.
+- [ ] Prepared answers for 5 production SRE scenarios.
+
+**Recommended practice order:** Security Context → ResourceQuota → LimitRange → Storage/PVC → DNS troubleshooting → Admission Controllers → Backup/Restore → Cluster Upgrade.
+
+**Important:** Use a local test cluster or a dedicated non-production environment. Do not perform etcd restore, cluster upgrades, or destructive storage operations on production infrastructure.

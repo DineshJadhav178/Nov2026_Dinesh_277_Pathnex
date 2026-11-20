@@ -1,0 +1,64 @@
+# Day 11 – Advanced Terraform Session Timing Log
+
+## What I Studied Today
+
+1. **1 Hour – Terraform Modules and Reusability**
+   - Understanding root and child modules.
+   - Creating reusable EC2 modules.
+   - Understanding module inputs and outputs.
+   - Passing variables between modules.
+   - Understanding module source paths.
+   - Organizing Terraform project directories.
+
+2. **1 Hour – Terraform Remote Backend and S3 State Management**
+   - Understanding local vs remote state.
+   - Configuring AWS S3 as a remote backend.
+   - Understanding state sharing across teams.
+   - Understanding state locking and concurrent operations.
+   - S3 bucket versioning and encryption.
+   - Understanding state security and access permissions.
+
+3. **1 Hour – Terraform Lifecycle Management**
+   - Understanding lifecycle blocks.
+   - create_before_destroy.
+   - prevent_destroy.
+   - ignore_changes.
+   - replace_triggered_by.
+   - Understanding infrastructure replacement and configuration drift.
+
+4. **1 Hour – Terraform Best Practices and Security**
+   - Using terraform fmt and terraform validate.
+   - Managing variables and sensitive values.
+   - Avoiding hard-coded credentials.
+   - Using Git for Terraform version control.
+   - Creating .gitignore for Terraform files.
+   - Understanding provider and module version constraints.
+
+5. **1 Hour – Hands-on AWS Infrastructure Project**
+   - Creating an S3 bucket using Terraform.
+   - Creating an EC2 instance using Terraform.
+   - Configuring AWS provider.
+   - Using variables and outputs.
+   - Executing terraform plan and apply.
+   - Verifying resources through AWS CLI.
+
+6. **1 Hour – Terraform Troubleshooting and Interview Scenarios**
+   - Understanding state file issues.
+   - Troubleshooting provider initialization errors.
+   - Handling resource drift.
+   - Understanding dependency and lifecycle errors.
+   - Troubleshooting remote backend configuration.
+   - Practicing real-world Terraform interview questions.
+
+## Tomorrow's Tasks
+
+1. Practice Terraform modules with multiple resources.
+2. Create reusable EC2 and S3 configurations.
+3. Revise remote backend and state locking.
+4. Practice lifecycle rules with sample resources.
+5. Understand Terraform dependency management.
+6. Explore Terraform workspaces and data sources.
+7. Practice Terraform troubleshooting scenarios.
+8. Spend 1 hour on Python coding.
+9. Continue SRE/DevOps interview preparation.
+10. Practice explaining Terraform projects in English.
