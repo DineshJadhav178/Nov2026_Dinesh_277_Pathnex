@@ -1,0 +1,21 @@
+# Day 07 – Kubernetes Session Timing Log
+
+## What I did today:
+
+1. 1 hour – Kubernetes Node Affinity: Understanding how to schedule Pods on specific worker nodes using node labels and scheduling rules.
+2. 1 hour – Pod Affinity and Pod Anti-Affinity: Understanding Pod placement, workload distribution and high availability across worker nodes.
+3. 1 hour – Required vs Preferred scheduling: Understanding hard scheduling rules using `requiredDuringSchedulingIgnoredDuringExecution` and soft scheduling preferences using `preferredDuringSchedulingIgnoredDuringExecution`.
+4. 1 hour – Kubernetes Taints and Tolerations: Understanding how to restrict Pod scheduling on specific nodes using `NoSchedule`, `PreferNoSchedule` and `NoExecute` effects.
+5. 1 hour – Kubernetes Probes: Understanding Liveness, Readiness and Startup Probes and their importance in application health monitoring.
+6. 30 minutes – AWS EKS production scenarios: Understanding how scheduling policies and health checks improve application availability, reliability and workload management.
+
+## Tomorrow's tasks:
+
+1. Kubernetes hands-on practice – Node Affinity and Pod Affinity.
+2. Practice Pod Anti-Affinity for high availability and workload distribution.
+3. Configure Taints and Tolerations on worker nodes.
+4. Create YAML manifests for Liveness, Readiness and Startup Probes.
+5. Simulate application health-check failures and observe Kubernetes recovery behaviour.
+6. Practice Kubernetes troubleshooting scenarios involving Pending Pods, node scheduling and container restarts.
+7. 1 hour – Python coding and automation practice.
+8. SRE interview preparation and English speaking practice.

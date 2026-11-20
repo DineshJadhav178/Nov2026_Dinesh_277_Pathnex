@@ -1,0 +1,591 @@
+# Day 07 – Advanced Kubernetes Coding Practice
+
+## 1. Node Affinity – Hands-on Practice
+
+**Objective:** Schedule Pods on specific worker nodes based on node labels.
+
+Check available nodes:
+
+```bash
+kubectl get nodes
+kubectl get nodes --show-labels
+```
+
+Add a label to a worker node:
+
+```bash
+kubectl label nodes NODE_NAME node-type=fast
+kubectl get nodes --show-labels
+```
+
+Create a YAML file:
+
+```bash
+nano node-affinity.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-type
+                operator: In
+                values:
+                  - fast
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f node-affinity.yaml
+kubectl get pods -o wide
+kubectl describe pod nginx-node-affinity
+```
+
+**Task:**
+- Label a worker node.
+- Schedule a Pod using Node Affinity.
+- Change the label and observe scheduling behaviour.
+- Understand what happens when no matching node is available.
+
+## 2. Required vs Preferred Node Affinity
+
+Understand the difference:
+
+- Required: Hard rule. A matching node must be available.
+- Preferred: Soft rule. Kubernetes tries to satisfy the preference but can schedule elsewhere.
+
+Create a YAML file:
+
+```bash
+nano preferred-affinity.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-preferred
+spec:
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 80
+          preference:
+            matchExpressions:
+              - key: node-type
+                operator: In
+                values:
+                  - fast
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+Execute:
+
+```bash
+kubectl apply -f preferred-affinity.yaml
+kubectl get pods -o wide
+kubectl describe pod nginx-preferred
+```
+
+**Task:**
+- Configure required Node Affinity.
+- Configure preferred Node Affinity.
+- Compare their scheduling behaviour.
+- Understand the role of the weight field.
+
+## 3. Pod Affinity – Schedule Pods Near Each Other
+
+**Objective:** Schedule application Pods close to related Pods.
+
+Create a base application Pod:
+
+```bash
+nano app-pod.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+Apply:
+
+```bash
+kubectl apply -f app-pod.yaml
+kubectl get pods --show-labels
+```
+
+Create a Pod using Pod Affinity:
+
+```bash
+nano pod-affinity.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: backend
+          topologyKey: kubernetes.io/hostname
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f pod-affinity.yaml
+kubectl get pods -o wide
+kubectl describe pod frontend
+```
+
+**Task:**
+- Create a backend Pod.
+- Schedule a frontend Pod near the backend Pod.
+- Understand how Pod labels and topology keys control scheduling.
+- Compare Pod Affinity with Node Affinity.
+
+## 4. Pod Anti-Affinity – High Availability
+
+**Objective:** Spread application replicas across different worker nodes.
+
+Create a Deployment:
+
+```bash
+nano anti-affinity.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ha
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-ha
+  template:
+    metadata:
+      labels:
+        app: nginx-ha
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: nginx-ha
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: nginx
+          image: nginx
+```
+
+Apply:
+
+```bash
+kubectl apply -f anti-affinity.yaml
+kubectl get pods -o wide
+kubectl describe deployment nginx-ha
+```
+
+**Task:**
+- Deploy two replicas.
+- Observe their node placement.
+- Scale the Deployment to three replicas.
+- Understand why strict Pod Anti-Affinity can leave Pods Pending when insufficient nodes are available.
+- Explore preferred Pod Anti-Affinity as a flexible alternative.
+
+## 5. Kubernetes Taints – Restrict Node Scheduling
+
+**Objective:** Prevent normal Pods from scheduling on selected worker nodes.
+
+Check nodes:
+
+```bash
+kubectl get nodes
+```
+
+Add a taint:
+
+```bash
+kubectl taint nodes NODE_NAME gpu=true:NoSchedule
+```
+
+Verify:
+
+```bash
+kubectl describe node NODE_NAME
+kubectl get nodes
+```
+
+Understand the three taint effects:
+
+1. NoSchedule – Prevents new Pods without matching tolerations from scheduling.
+2. PreferNoSchedule – Kubernetes tries to avoid scheduling Pods on the node.
+3. NoExecute – Prevents new non-tolerating Pods and can evict existing non-tolerating Pods.
+
+**Task:**
+- Apply a taint to a test node.
+- Try scheduling a normal Pod.
+- Observe whether it gets scheduled.
+- Remove the taint after testing:
+
+```bash
+kubectl taint nodes NODE_NAME gpu=true:NoSchedule-
+```
+
+## 6. Kubernetes Tolerations – Allow Selected Pods
+
+Create a Pod with a matching toleration:
+
+```bash
+nano gpu-pod.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod
+spec:
+  tolerations:
+    - key: "gpu"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+Apply:
+
+```bash
+kubectl apply -f gpu-pod.yaml
+kubectl get pods -o wide
+kubectl describe pod gpu-pod
+```
+
+**Task:**
+- Apply the `gpu=true:NoSchedule` taint to a test node.
+- Create a Pod without a toleration.
+- Create another Pod with a matching toleration.
+- Compare scheduling results.
+- Understand that a toleration permits scheduling but does not guarantee that the Pod will run on that node.
+
+## 7. Liveness Probe – Container Health Check
+
+**Objective:** Restart a container when its application becomes unhealthy.
+
+Create a YAML file:
+
+```bash
+nano liveness-probe.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-demo
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        timeoutSeconds: 2
+        failureThreshold: 3
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f liveness-probe.yaml
+kubectl get pods
+kubectl describe pod liveness-demo
+kubectl get events
+```
+
+**Task:**
+- Configure a Liveness Probe.
+- Understand failure thresholds.
+- Observe container restart behaviour when the health check repeatedly fails.
+- Check restart counts.
+
+## 8. Readiness Probe – Application Traffic Management
+
+**Objective:** Send traffic only to Pods that are ready to serve requests.
+
+Create:
+
+```bash
+nano readiness-probe.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: readiness-demo
+  labels:
+    app: readiness-demo
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 2
+        failureThreshold: 3
+```
+
+Apply:
+
+```bash
+kubectl apply -f readiness-probe.yaml
+kubectl get pods
+kubectl describe pod readiness-demo
+```
+
+Create a Service:
+
+```bash
+kubectl expose pod readiness-demo --name=readiness-service --port=80
+kubectl get services
+kubectl get endpoints readiness-service
+```
+
+**Task:**
+- Configure a Readiness Probe.
+- Observe the READY status of the Pod.
+- Understand how failed readiness checks remove a Pod from ready Service endpoints.
+- Understand why a readiness failure does not automatically restart a container.
+
+## 9. Startup Probe – Slow Application Initialization
+
+**Objective:** Give slow-starting applications enough time to initialize.
+
+Create:
+
+```bash
+nano startup-probe.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: startup-demo
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      startupProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 5
+        failureThreshold: 30
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 10
+        failureThreshold: 3
+```
+
+Apply:
+
+```bash
+kubectl apply -f startup-probe.yaml
+kubectl get pods
+kubectl describe pod startup-demo
+kubectl get events
+```
+
+**Task:**
+- Configure a Startup Probe.
+- Understand how it protects slow-starting applications.
+- Learn how Startup Probe success allows Liveness and Readiness checks to begin.
+- Compare all three probe types.
+
+## 10. Combined Kubernetes Health Check Configuration
+
+Create a production-style example:
+
+```bash
+nano combined-probes.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: production-app
+  labels:
+    app: production-app
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      startupProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 5
+        failureThreshold: 30
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 10
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 5
+        failureThreshold: 3
+```
+
+Execute:
+
+```bash
+kubectl apply -f combined-probes.yaml
+kubectl get pods
+kubectl describe pod production-app
+kubectl get events
+kubectl get pods -w
+```
+
+**Task:**
+- Configure all three probes in one container.
+- Understand the purpose of each health check.
+- Observe container restart and Pod readiness status.
+- Explain how probes improve production application availability.
+
+## 11. Kubernetes Troubleshooting – Practical Scenarios
+
+Practice the following commands:
+
+```bash
+kubectl get pods -o wide
+kubectl describe pod POD_NAME
+kubectl get nodes --show-labels
+kubectl describe node NODE_NAME
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl logs POD_NAME
+kubectl logs POD_NAME --previous
+kubectl get endpoints
+kubectl get pods -w
+kubectl top nodes
+kubectl top pods
+```
+
+Troubleshooting exercises:
+
+1. A Pod remains Pending because no node matches its Node Affinity rules.
+2. A Pod has a toleration but is not getting scheduled on the expected node.
+3. A Pod is stuck because of strict Pod Anti-Affinity.
+4. A node has a NoSchedule taint and application Pods cannot run on it.
+5. A container repeatedly restarts because its Liveness Probe fails.
+6. An application is running, but the Readiness Probe is failing.
+7. A slow-starting application is being restarted before initialization completes.
+8. A worker node has insufficient CPU or memory for the requested workload.
+
+## 12. Real-Time SRE & DevOps Interview Scenarios
+
+1. What is the difference between Node Affinity and Pod Affinity?
+2. What is the difference between required and preferred scheduling?
+3. How would you distribute three application replicas across different worker nodes?
+4. What happens when a Pod does not tolerate a node's NoSchedule taint?
+5. Can a Pod with a toleration still be scheduled on another node?
+6. What is the difference between NoSchedule and NoExecute?
+7. What happens when a Liveness Probe fails repeatedly?
+8. What happens when a Readiness Probe fails?
+9. Why do we need a Startup Probe for slow-starting applications?
+10. Can a container be running while its Pod is not Ready?
+11. How would you troubleshoot a Pod stuck in Pending due to scheduling constraints?
+12. How do probes help prevent unhealthy application traffic in AWS EKS?
+13. How would you maintain high availability during worker node maintenance?
+14. What would you check if all replicas are scheduled on a single worker node?
+
+## Daily Completion Checklist
+
+- [ ] Practice Node Affinity using node labels.
+- [ ] Understand required and preferred scheduling.
+- [ ] Configure Pod Affinity.
+- [ ] Configure Pod Anti-Affinity.
+- [ ] Apply and remove Kubernetes node taints.
+- [ ] Create Pods with matching tolerations.
+- [ ] Configure Liveness Probe.
+- [ ] Configure Readiness Probe.
+- [ ] Configure Startup Probe.
+- [ ] Practice all three probes together.
+- [ ] Complete at least five Kubernetes troubleshooting exercises.
+- [ ] Prepare answers for at least five SRE interview scenarios.
+- [ ] Save YAML manifests, commands, outputs and learnings in GitHub.
+
+**Important:** Perform scheduling and taint exercises in a test cluster with suitable worker nodes. A single-node local cluster may not be able to demonstrate multi-node placement. Also remember: Node Affinity and Pod Affinity influence scheduling; the `IgnoredDuringExecution` suffix means changes to matching labels after scheduling do not automatically evict an already-running Pod. Never test disruptive NoExecute taints on production workloads.
