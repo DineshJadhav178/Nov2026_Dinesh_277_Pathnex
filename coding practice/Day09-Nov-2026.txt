@@ -1,0 +1,479 @@
+# Day 09 – Amazon EKS Cluster Upgrade Coding Practice
+
+## 1. Check Existing EKS Cluster Details
+
+**Objective:** Understand the current cluster version and configuration before starting an upgrade.
+
+Commands:
+
+```bash
+# List available EKS clusters
+eksctl get clusters --region REGION
+
+# Check a specific cluster
+eksctl get cluster \
+  --name CLUSTER_NAME \
+  --region REGION
+
+# Check Kubernetes client and server versions
+kubectl version
+
+# Check cluster nodes
+kubectl get nodes -o wide
+
+# Check cluster information
+kubectl cluster-info
+```
+
+Tasks:
+
+- Identify the current Kubernetes version.
+- Identify the cluster region.
+- Check the status of worker nodes.
+- Record the current node group configuration.
+- Understand the difference between control plane and worker node versions.
+
+## 2. Prepare the EKS Pre-Upgrade Checklist
+
+**Objective:** Identify potential issues before upgrading the cluster.
+
+Commands:
+
+```bash
+# Check all nodes
+kubectl get nodes
+
+# Check all Pods
+kubectl get pods -A
+
+# Check Deployments
+kubectl get deployments -A
+
+# Check DaemonSets
+kubectl get daemonsets -A
+
+# Check StatefulSets
+kubectl get statefulsets -A
+
+# Check cluster events
+kubectl get events -A \
+  --sort-by=.metadata.creationTimestamp
+```
+
+Check the add-ons and components:
+
+```bash
+# List EKS add-ons
+aws eks list-addons \
+  --cluster-name CLUSTER_NAME \
+  --region REGION
+
+# Check add-on versions
+aws eks describe-addon \
+  --cluster-name CLUSTER_NAME \
+  --addon-name coredns \
+  --region REGION
+
+# Check Kubernetes system workloads
+kubectl get deployments,daemonsets \
+  -n kube-system
+```
+
+Tasks:
+
+- Record CoreDNS, kube-proxy and VPC CNI versions.
+- Check Metrics Server.
+- Identify Istio, KEDA and Karpenter if installed.
+- Review deprecated APIs and workload compatibility.
+- Review EKS upgrade insights and relevant release notes.
+- Prepare a backup and recovery plan.
+
+**Important:** HPA is a Kubernetes autoscaling resource, not an EKS managed add-on. Karpenter, Istio and KEDA have their own installation and upgrade processes.
+
+## 3. Understand EKS Add-on Upgrades
+
+**Objective:** Learn how to upgrade EKS managed add-ons.
+
+First, check available versions:
+
+```bash
+aws eks describe-addon-versions \
+  --addon-name coredns \
+  --kubernetes-version TARGET_VERSION \
+  --region REGION
+```
+
+Check the installed add-ons:
+
+```bash
+aws eks list-addons \
+  --cluster-name CLUSTER_NAME \
+  --region REGION
+```
+
+Upgrade CoreDNS:
+
+```bash
+aws eks update-addon \
+  --cluster-name CLUSTER_NAME \
+  --addon-name coredns \
+  --addon-version COMPATIBLE_ADDON_VERSION \
+  --region REGION
+```
+
+Upgrade kube-proxy:
+
+```bash
+aws eks update-addon \
+  --cluster-name CLUSTER_NAME \
+  --addon-name kube-proxy \
+  --addon-version COMPATIBLE_ADDON_VERSION \
+  --region REGION
+```
+
+Upgrade VPC CNI:
+
+```bash
+aws eks update-addon \
+  --cluster-name CLUSTER_NAME \
+  --addon-name vpc-cni \
+  --addon-version COMPATIBLE_ADDON_VERSION \
+  --region REGION
+```
+
+You can also study the eksctl approach:
+
+```bash
+eksctl update addon \
+  --name coredns \
+  --cluster CLUSTER_NAME \
+  --region REGION
+```
+
+Tasks:
+
+- Understand compatible add-on versions.
+- Check add-on update status.
+- Understand configuration conflicts during updates.
+- Learn how to handle add-on health issues.
+- Review the upgrade instructions for Istio, KEDA and Karpenter separately.
+
+**Important:** Add-on upgrade order depends on the target Kubernetes version and AWS compatibility guidance. Do not blindly upgrade every add-on before the control plane. Follow the EKS upgrade guidance for that specific version.
+
+## 4. Upgrade the EKS Control Plane
+
+**Objective:** Understand how to upgrade the EKS control plane.
+
+Check the current version:
+
+```bash
+aws eks describe-cluster \
+  --name CLUSTER_NAME \
+  --region REGION \
+  --query "cluster.version"
+```
+
+Upgrade using eksctl:
+
+```bash
+eksctl upgrade cluster \
+  --name CLUSTER_NAME \
+  --version TARGET_VERSION \
+  --region REGION
+```
+
+Alternatively, use the AWS CLI:
+
+```bash
+aws eks update-cluster-version \
+  --name CLUSTER_NAME \
+  --kubernetes-version TARGET_VERSION \
+  --region REGION
+```
+
+Check upgrade status:
+
+```bash
+aws eks describe-cluster \
+  --name CLUSTER_NAME \
+  --region REGION \
+  --query "cluster.status"
+```
+
+Tasks:
+
+- Understand control plane upgrade steps.
+- Monitor the upgrade status.
+- Understand the sequential minor-version upgrade requirement.
+- Review deprecated APIs and upgrade insights.
+- Validate API Server availability after the upgrade.
+
+**Important:** EKS does not support skipping Kubernetes minor versions. For example, an upgrade from 1.32 to 1.34 must go through 1.33 first, assuming those versions are supported for the cluster.
+
+The EKS control plane upgrade is managed by AWS, but applications and workloads still need validation.
+
+## 5. Create a New EKS Managed Node Group
+
+**Objective:** Understand blue-green worker node migration.
+
+Example command for creating a new node group:
+
+```bash
+eksctl create nodegroup \
+  --cluster CLUSTER_NAME \
+  --name NEW_NODEGROUP \
+  --node-type t3.medium \
+  --nodes 3 \
+  --nodes-min 1 \
+  --nodes-max 5 \
+  --region REGION
+```
+
+Tasks:
+
+- Understand node group configuration.
+- Check the node AMI and Kubernetes version.
+- Understand the role of launch templates.
+- Review EKS-optimized AMI compatibility.
+- Understand how new nodes join the cluster.
+
+**Important:** Use a compatible AMI and node group configuration for your target Kubernetes version. The exact command and options depend on your eksctl version and node group configuration. Do not assume an older AMI family is supported for every upgrade.
+
+## 6. Cordon and Drain Old Worker Nodes
+
+**Objective:** Safely move workloads away from old worker nodes.
+
+Check nodes:
+
+```bash
+kubectl get nodes -o wide
+```
+
+Cordon an old node:
+
+```bash
+kubectl cordon OLD_NODE_NAME
+```
+
+Check scheduling status:
+
+```bash
+kubectl get nodes
+```
+
+Drain the node:
+
+```bash
+kubectl drain OLD_NODE_NAME \
+  --ignore-daemonsets \
+  --delete-emptydir-data
+```
+
+Verify workloads:
+
+```bash
+kubectl get pods -A -o wide
+kubectl get nodes
+```
+
+After the node has been safely replaced, remove its scheduling restriction if you are keeping it:
+
+```bash
+kubectl uncordon OLD_NODE_NAME
+```
+
+Tasks:
+
+- Understand cordon vs drain.
+- Check Pod rescheduling.
+- Review Pod Disruption Budgets.
+- Identify Pods that cannot be evicted.
+- Understand DaemonSet behavior during drain.
+
+**Important:** Draining can be blocked by Pod Disruption Budgets or certain unmanaged Pods. Check workload replicas, available capacity and storage constraints before proceeding.
+
+## 7. Delete the Old Node Group
+
+**Objective:** Understand the cleanup process after successful migration.
+
+First verify:
+
+```bash
+kubectl get nodes
+kubectl get pods -A
+kubectl get deployments -A
+```
+
+Then, only after confirming the old node group is no longer required:
+
+```bash
+eksctl delete nodegroup \
+  --cluster CLUSTER_NAME \
+  --name OLD_NODEGROUP \
+  --region REGION
+```
+
+Tasks:
+
+- Confirm workloads are running on new nodes.
+- Validate application health.
+- Check monitoring and alerting.
+- Verify storage and networking.
+- Understand the impact of deleting old worker nodes.
+
+## 8. Upgrade Self-Managed Worker Nodes
+
+**Objective:** Understand how self-managed EC2 worker nodes are upgraded.
+
+Study the following process:
+
+1. Identify the Auto Scaling Group.
+2. Check the current launch template.
+3. Identify the compatible EKS-optimized AMI.
+4. Create a new launch template version.
+5. Update the Auto Scaling Group configuration.
+6. Launch replacement instances.
+7. Validate new worker nodes.
+8. Cordon and drain old nodes.
+9. Remove old instances after successful migration.
+
+Useful AWS CLI commands:
+
+```bash
+# List Auto Scaling Groups
+aws autoscaling describe-auto-scaling-groups \
+  --region REGION
+
+# List launch templates
+aws ec2 describe-launch-templates \
+  --region REGION
+
+# Check cluster nodes
+kubectl get nodes -o wide
+```
+
+## 9. Post-Upgrade Validation
+
+**Objective:** Verify that the cluster is healthy after the upgrade.
+
+Commands:
+
+```bash
+# Verify node status and versions
+kubectl get nodes -o wide
+
+# Verify all Pods
+kubectl get pods -A
+
+# Check Deployments
+kubectl get deployments -A
+
+# Check DaemonSets
+kubectl get daemonsets -A
+
+# Check StatefulSets
+kubectl get statefulsets -A
+
+# Check system workloads
+kubectl get pods -n kube-system
+
+# Check cluster events
+kubectl get events -A \
+  --sort-by=.metadata.creationTimestamp
+```
+
+Validate:
+
+- All expected nodes are Ready.
+- Application Pods are Running or Completed as expected.
+- No unexpected CrashLoopBackOff or ImagePullBackOff.
+- CoreDNS resolves service names.
+- VPC CNI and kube-proxy are healthy.
+- Application connectivity is working.
+- Monitoring and alerting are operational.
+- Load balancers and ingress routes are working.
+- Persistent volumes are mounted correctly.
+
+## 10. EKS Upgrade Troubleshooting Scenarios
+
+**Scenario 1: Node is NotReady after an upgrade**
+
+Investigation:
+
+```bash
+kubectl describe node NODE_NAME
+kubectl get pods -A -o wide
+kubectl get events -A
+```
+
+Check kubelet, networking, node IAM permissions, CNI health and instance configuration.
+
+**Scenario 2: Pods are stuck in Pending after draining**
+
+Investigation:
+
+```bash
+kubectl describe pod POD_NAME -n NAMESPACE
+kubectl get nodes
+kubectl get pdb -A
+kubectl get pods -A -o wide
+```
+
+Check available CPU/memory, affinity rules, taints, tolerations and Pod Disruption Budgets.
+
+**Scenario 3: CoreDNS fails after an upgrade**
+
+Investigation:
+
+```bash
+kubectl get pods -n kube-system
+kubectl get deployments -n kube-system
+kubectl logs -n kube-system \
+  -l k8s-app=kube-dns
+```
+
+Check add-on compatibility, Pod health, configuration and DNS resolution.
+
+**Scenario 4: Application downtime during node migration**
+
+Investigation:
+
+- Check application replicas.
+- Review Pod Disruption Budgets.
+- Check node capacity.
+- Verify readiness probes.
+- Review load balancer target health.
+- Confirm workloads are distributed across nodes.
+
+## 11. Rollback and Recovery Strategy
+
+Understand these important points:
+
+- EKS does not provide a direct control plane downgrade or rollback.
+- If the control plane upgrade completes, recovery generally involves fixing compatibility issues or moving forward to a supported version.
+- Managed add-on versions may be changed to a compatible version where supported.
+- Old node groups can be retained temporarily during migration to provide a recovery option.
+- A failed node migration can be addressed by restoring capacity and correcting the node group configuration.
+- Backup and disaster recovery plans should be prepared before the upgrade.
+
+**Interview question:** How would you handle an EKS upgrade if application workloads start failing after the control plane upgrade?
+
+## 12. Daily Completion Checklist
+
+- [ ] Checked current EKS cluster version.
+- [ ] Prepared the pre-upgrade checklist.
+- [ ] Checked add-on versions and compatibility.
+- [ ] Practiced managed add-on upgrade commands.
+- [ ] Understood control plane upgrade.
+- [ ] Practiced creating a new node group.
+- [ ] Understood cordon and drain.
+- [ ] Studied self-managed node group upgrades.
+- [ ] Completed post-upgrade validation commands.
+- [ ] Prepared rollback and recovery scenarios.
+- [ ] Practiced explaining the EKS upgrade process in an interview.
+
+**Recommended sequence:**
+
+Pre-Upgrade Checks → Compatibility Review → Add-on Upgrades → Control Plane Upgrade → Worker Node Upgrade → Workload Migration → Post-Upgrade Validation → Recovery Planning.
+
+**Safety note:** Perform actual upgrades only in a dedicated test environment with the required AWS permissions. The commands above contain placeholders; replace them with your actual cluster configuration. Do not execute node group deletion, drain or upgrade commands on production without an approved maintenance plan.

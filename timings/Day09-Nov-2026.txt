@@ -1,0 +1,63 @@
+# Day 09 – Amazon EKS Cluster Upgrade Session Timing Log
+
+## What I Studied Today
+
+1. **1 Hour – EKS Upgrade Fundamentals and Pre-Upgrade Checklist**
+   - Understanding EKS control plane and worker node versions.
+   - Checking the current Kubernetes version using eksctl and AWS Console.
+   - Understanding Kubernetes version compatibility.
+   - Reviewing Kubernetes and EKS release notes.
+   - Identifying deprecated APIs and breaking changes.
+   - Preparing the pre-upgrade checklist.
+
+2. **1 Hour – EKS Add-ons Compatibility and Upgrade**
+   - Understanding EKS managed add-ons.
+   - CoreDNS, kube-proxy and Amazon VPC CNI.
+   - Metrics Server and other cluster components.
+   - Understanding Istio, KEDA and Karpenter upgrades.
+   - Checking add-on compatibility before upgrading.
+   - Understanding the difference between managed and self-managed add-ons.
+
+3. **1 Hour – EKS Control Plane Upgrade**
+   - Understanding the EKS control plane architecture.
+   - Upgrading the control plane using eksctl.
+   - Understanding AWS Console upgrade options.
+   - Sequential Kubernetes minor-version upgrades.
+   - Understanding control plane availability during upgrades.
+   - Reviewing upgrade status and monitoring events.
+
+4. **1 Hour – EKS Worker Node Group Upgrade**
+   - Understanding Managed Node Groups and Self-Managed Node Groups.
+   - Creating a new node group with an updated AMI.
+   - Understanding EKS-optimized AMIs.
+   - Cordon and drain operations.
+   - Migrating workloads to new worker nodes.
+   - Deleting old node groups after successful validation.
+
+5. **1 Hour – Post-Upgrade Validation and Troubleshooting**
+   - Checking Kubernetes node status.
+   - Validating Pod and Deployment health.
+   - Verifying CoreDNS, VPC CNI and kube-proxy.
+   - Checking application connectivity and monitoring.
+   - Troubleshooting Pending Pods and node readiness issues.
+   - Understanding rollback limitations and recovery strategies.
+
+6. **1 Hour – Production SRE Scenarios and Interview Preparation**
+   - Planning a zero/minimal-downtime EKS upgrade.
+   - Handling workload disruption during node draining.
+   - Understanding Pod Disruption Budgets.
+   - Handling add-on compatibility issues.
+   - Preparing an end-to-end EKS upgrade interview answer.
+   - Understanding forward recovery when an upgrade encounters issues.
+
+## Tomorrow's Tasks
+
+1. Practice EKS version and add-on compatibility checks.
+2. Prepare an EKS cluster upgrade checklist.
+3. Practice creating and updating node groups in a test environment.
+4. Understand cordon, drain and uncordon commands.
+5. Practice Kubernetes upgrade troubleshooting scenarios.
+6. Revise Pod Disruption Budgets and workload availability.
+7. Spend 1 hour on Python coding.
+8. Practice SRE/DevOps interview questions.
+9. Continue English speaking and technical explanation practice.
