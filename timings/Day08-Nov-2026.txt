@@ -1,57 +1,64 @@
-# Day 08 – Advanced Kubernetes Session Timing Log
+# Day 08 – Apache Kafka Architecture Session Timing Log
 
 ## What I Studied Today
 
-1. **1 Hour – Kubernetes Security and Pod Security**
-   - Security Context: `runAsUser`, `runAsGroup`, `fsGroup`
-   - Running containers as non-root users
-   - Linux capabilities and privilege escalation
-   - Pod Security Standards: Privileged, Baseline and Restricted
-   - Read-only root filesystem
+1. **1 Hour – Introduction to Apache Kafka**
+   - Understanding Apache Kafka and distributed streaming.
+   - Kafka vs traditional messaging systems.
+   - Understanding real-time data pipelines.
+   - Kafka architecture and use cases.
+   - High throughput, scalability and fault tolerance.
+   - Understanding event-driven architecture.
 
-2. **1 Hour – Kubernetes Cluster Backup and Disaster Recovery**
-   - Understanding etcd and its importance
-   - etcd snapshots and backup concepts
-   - Restore process and disaster recovery
-   - Understanding RPO and RTO
-   - Backup strategies using Velero
+2. **1 Hour – Kafka Core Architecture and Components**
+   - Understanding Producers and Consumers.
+   - Kafka Brokers and Clusters.
+   - Topics and Partitions.
+   - Understanding message keys and partitioning.
+   - Kafka message flow.
+   - Understanding Kafka architecture diagrams.
 
-3. **1 Hour – Kubernetes Cluster Upgrade and Maintenance**
-   - Kubernetes version compatibility
-   - Control plane and worker node upgrades
-   - Upgrade planning and pre-checks
-   - Node draining and workload rescheduling
-   - Post-upgrade validation
+3. **1 Hour – Kafka Replication and Fault Tolerance**
+   - Understanding partition leaders and followers.
+   - Replication factor and replica management.
+   - Leader and follower synchronization.
+   - Understanding In-Sync Replicas (ISR).
+   - Producer acknowledgment levels: acks=0, acks=1 and acks=all.
+   - Understanding broker failure and leader election.
 
-4. **1 Hour – Advanced Kubernetes Storage**
-   - Container Storage Interface (CSI)
-   - Persistent Volumes and Persistent Volume Claims
-   - Storage Classes and dynamic provisioning
-   - Volume snapshots and restore concepts
-   - Understanding access modes and reclaim policies
+4. **1 Hour – Kafka Consumer Groups and Offset Management**
+   - Understanding consumer groups.
+   - Consumer-to-partition assignment.
+   - Understanding parallel message processing.
+   - Kafka offsets and offset commits.
+   - Automatic vs manual offset commits.
+   - Consumer lag and rebalancing concepts.
 
-5. **1 Hour – Admission Controllers and Kubernetes Policies**
-   - Understanding admission controllers
-   - Mutating vs Validating Admission Webhooks
-   - ResourceQuota and LimitRange
-   - Enforcing workload security policies
-   - Policy tools overview: Kyverno and OPA Gatekeeper
+5. **1 Hour – Kafka Cluster Management and Ecosystem**
+   - Understanding ZooKeeper and KRaft architecture.
+   - Kafka Connect and source/sink connectors.
+   - Kafka Streams and real-time data processing.
+   - Understanding topic retention and log cleanup.
+   - Kafka cluster scalability and monitoring.
+   - Understanding broker and partition distribution.
 
-6. **1 Hour – Advanced Troubleshooting and Production Scenarios**
-   - Kubernetes DNS troubleshooting
-   - ImagePullBackOff and container startup failures
-   - PVC Pending and mount failures
-   - Node NotReady scenarios
-   - Cluster upgrade and etcd-related incidents
+6. **1 Hour – Kafka Data Flow and SRE Use Cases**
+   - Producer-to-broker communication.
+   - Broker replication and consumer data flow.
+   - Log aggregation using Kafka.
+   - Real-time monitoring and event processing.
+   - Understanding Kafka in microservices architecture.
+   - Troubleshooting broker failures and consumer lag.
 
 ## Tomorrow's Tasks
 
-1. Practice Kubernetes Security Context and Pod Security Standards.
-2. Perform hands-on Persistent Volume and Storage Class exercises.
-3. Practice ResourceQuota and LimitRange YAML configurations.
-4. Understand Kubernetes admission webhooks and policy enforcement.
-5. Practice Kubernetes DNS and storage troubleshooting.
-6. Revise etcd backup, restore and cluster upgrade concepts.
-7. Complete 1 hour of Python coding.
-8. Practice SRE scenario-based interview questions.
-9. Spend time on English communication and technical explanation.
+1. Practice Kafka installation and cluster setup in a test environment.
+2. Create Kafka topics and configure partitions.
+3. Practice producing and consuming messages.
+4. Understand consumer groups and offset management.
+5. Practice topic replication and partition leadership concepts.
+6. Understand Kafka monitoring and consumer lag.
+7. Practice Kafka troubleshooting scenarios.
+8. Spend 1 hour on Python coding.
+9. Prepare SRE/DevOps interview questions.
+10. Continue English communication and technical explanation practice.

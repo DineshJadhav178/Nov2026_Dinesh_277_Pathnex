@@ -1,388 +1,493 @@
-# Day 08 – Advanced Kubernetes Coding Practice
+# Day 08 – Apache Kafka Coding Practice
 
-## 1. Kubernetes Security Context
+## 1. Understand Kafka Environment and Installation
 
-**Objective:** Run containers with restricted permissions and understand container-level security.
+**Objective:** Understand Kafka installation and verify the environment.
 
 Tasks:
 
-- Create a Pod using a non-root user.
-- Configure `runAsUser` and `runAsGroup`.
-- Configure `fsGroup`.
-- Enable read-only root filesystem.
-- Disable privilege escalation.
-- Verify the container's user.
+- Understand Kafka broker architecture.
+- Learn the difference between ZooKeeper mode and KRaft mode.
+- Understand Kafka server configuration.
+- Identify Kafka broker and controller roles.
+- Learn basic Kafka CLI commands.
 
-Create `security-pod.yaml`:
+Check Java:
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: secure-nginx
-spec:
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 101
-    runAsGroup: 101
-    fsGroup: 101
-  containers:
-    - name: nginx
-      image: nginxinc/nginx-unprivileged:stable
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        capabilities:
-          drop:
-            - ALL
+```bash
+java -version
 ```
+
+Check Kafka installation:
+
+```bash
+kafka-topics.sh --help
+```
+
+**Note:** Kafka requires a compatible Java runtime. Use the official Kafka distribution and follow its version-specific setup instructions.
+
+## 2. Start Kafka in KRaft Mode
+
+**Objective:** Understand how Kafka works without ZooKeeper.
+
+Tasks:
+
+- Understand KRaft architecture.
+- Learn the role of Kafka controllers.
+- Understand metadata management.
+- Explore broker and controller configuration.
+
+For a local test environment, follow the official Kafka KRaft quickstart to generate a cluster ID, format the storage directory and start the server.
+
+Typical commands in a configured Kafka installation:
+
+```bash
+# Generate a cluster ID
+KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
+
+# Format Kafka storage using the configured server properties
+bin/kafka-storage.sh format \
+  --standalone \
+  -t "$KAFKA_CLUSTER_ID" \
+  -c config/server.properties
+
+# Start Kafka
+bin/kafka-server-start.sh config/server.properties
+```
+
+**Important:** These commands assume a compatible standalone KRaft configuration. Do not format an existing Kafka data directory without understanding the impact.
+
+## 3. Create Your First Kafka Topic
+
+**Objective:** Understand topics and partitions.
+
+Create a topic:
+
+```bash
+kafka-topics.sh \
+  --bootstrap-server localhost:9092 \
+  --create \
+  --topic pathnex-events \
+  --partitions 3 \
+  --replication-factor 1
+```
+
+List topics:
+
+```bash
+kafka-topics.sh \
+  --bootstrap-server localhost:9092 \
+  --list
+```
+
+Describe topic:
+
+```bash
+kafka-topics.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --topic pathnex-events
+```
+
+Tasks:
+
+- Create a Kafka topic.
+- Understand topic names.
+- Configure partitions.
+- Understand replication factor.
+- Observe partition distribution.
+
+**Note:** Replication factor 1 is suitable for a single-broker local lab. For a multi-broker cluster, practice replication factor 2 or 3 where the number of available brokers permits it.
+
+## 4. Produce Messages Using Kafka Producer
+
+**Objective:** Send messages to a Kafka topic.
+
+Run the producer:
+
+```bash
+kafka-console-producer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic pathnex-events
+```
+
+Enter sample messages:
+
+```text
+Application started successfully
+CPU utilization reached 80%
+Memory utilization reached 75%
+Application health check successful
+Database connection timeout
+```
+
+Tasks:
+
+- Produce multiple messages.
+- Understand producer-to-broker communication.
+- Understand message keys.
+- Learn partitioning strategies.
+- Understand producer acknowledgments.
+
+Try producing messages with keys:
+
+```bash
+kafka-console-producer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic pathnex-events \
+  --property parse.key=true \
+  --property key.separator=:
+```
+
+Enter:
+
+```text
+server-01:CPU utilization is high
+server-02:Memory utilization is high
+server-01:Application restarted
+```
+
+Observe how records with the same key are routed to the same partition under the default keyed partitioning behavior.
+
+## 5. Consume Messages Using Kafka Consumer
+
+**Objective:** Read messages from Kafka topics.
+
+Start a consumer:
+
+```bash
+kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic pathnex-events \
+  --from-beginning
+```
+
+Tasks:
+
+- Read messages from a topic.
+- Understand consumer subscriptions.
+- Understand partition consumption.
+- Learn how consumers process records.
+- Understand the difference between new and existing messages.
+
+## 6. Kafka Consumer Groups
+
+**Objective:** Understand parallel processing using consumer groups.
+
+Start a consumer with a group ID:
+
+```bash
+kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic pathnex-events \
+  --group pathnex-consumer-group
+```
+
+Open another terminal and start another consumer using the same group:
+
+```bash
+kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic pathnex-events \
+  --group pathnex-consumer-group
+```
+
+Check consumer groups:
+
+```bash
+kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --list
+```
+
+Describe a consumer group:
+
+```bash
+kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --group pathnex-consumer-group
+```
+
+Tasks:
+
+- Create a consumer group.
+- Run multiple consumers in the same group.
+- Understand partition assignment.
+- Understand consumer parallelism.
+- Understand consumer rebalancing.
+
+**Important:** Within a consumer group, a partition is assigned to at most one consumer at a time. Additional consumers beyond the number of partitions may remain idle.
+
+## 7. Understand Kafka Offsets
+
+**Objective:** Understand how Kafka tracks consumer progress.
 
 Commands:
 
 ```bash
-kubectl apply -f security-pod.yaml
-kubectl get pods
-kubectl describe pod secure-nginx
-kubectl exec secure-nginx -- id
+kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --group pathnex-consumer-group
 ```
 
-**Important:** A read-only root filesystem may require writable mounted volumes for application temporary files. Understand why a container might fail when it tries to write to its filesystem.
+Understand these fields:
 
-## 2. Pod Security Standards
-
-Understand the three security levels:
-
-- Privileged: Minimal restrictions.
-- Baseline: Prevents known privilege escalations.
-- Restricted: Applies stronger security requirements.
+- CURRENT-OFFSET
+- LOG-END-OFFSET
+- LAG
+- PARTITION
+- CONSUMER-ID
 
 Tasks:
 
-```bash
-kubectl create namespace secure-app
-kubectl label namespace secure-app \
-  pod-security.kubernetes.io/enforce=restricted
-kubectl get namespace secure-app --show-labels
-```
+- Understand what an offset represents.
+- Learn automatic offset commits.
+- Understand manual offset commits.
+- Learn how consumers resume processing.
+- Understand the impact of offset resets.
 
-Try deploying a non-compliant Pod and observe the rejection.
-
-**Interview question:** What is the difference between Security Context and Pod Security Standards?
-
-## 3. Kubernetes ResourceQuota
-
-**Objective:** Control the resource consumption of a namespace.
-
-Create `resource-quota.yaml`:
-
-```yaml
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: app-quota
-  namespace: secure-app
-spec:
-  hard:
-    pods: "10"
-    requests.cpu: "2"
-    requests.memory: 2Gi
-    limits.cpu: "4"
-    limits.memory: 4Gi
-```
-
-Commands:
+Practice inspecting offsets:
 
 ```bash
-kubectl apply -f resource-quota.yaml
-kubectl describe resourcequota -n secure-app
-kubectl get resourcequota -n secure-app
+kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --group pathnex-consumer-group
 ```
+
+Understand the difference between:
+
+- `--to-earliest`
+- `--to-latest`
+- `--to-offset`
+
+Do not reset offsets in a shared or production consumer group without approval.
+
+## 8. Kafka Replication and Broker Architecture
+
+**Objective:** Understand Kafka fault tolerance.
 
 Tasks:
 
-- Create multiple Pods in the namespace.
-- Observe quota usage.
-- Try exceeding the configured limits.
-- Understand why Kubernetes rejects additional resource requests.
+- Understand leader and follower replicas.
+- Understand replication factor.
+- Understand In-Sync Replicas (ISR).
+- Understand leader election.
+- Understand broker failure scenarios.
+- Learn how Kafka maintains data availability.
 
-## 4. Kubernetes LimitRange
-
-**Objective:** Set default and maximum resource limits for containers.
-
-Create `limit-range.yaml`:
-
-```yaml
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: app-limits
-  namespace: secure-app
-spec:
-  limits:
-    - type: Container
-      default:
-        cpu: "500m"
-        memory: "512Mi"
-      defaultRequest:
-        cpu: "100m"
-        memory: "128Mi"
-      max:
-        cpu: "1"
-        memory: "1Gi"
-      min:
-        cpu: "100m"
-        memory: "128Mi"
-```
-
-Commands:
+Inspect topic details:
 
 ```bash
-kubectl apply -f limit-range.yaml
-kubectl describe limitrange -n secure-app
+kafka-topics.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --topic pathnex-events
 ```
 
-Tasks:
+**Important:** A single-broker cluster cannot demonstrate replication across multiple brokers. Use a multi-broker test cluster for replication and broker failure exercises.
 
-- Create a Pod without resource requests and limits.
-- Inspect the automatically assigned defaults.
-- Try creating a Pod that exceeds the maximum values.
+## 9. Kafka Producer Acknowledgment Levels
 
-## 5. Advanced Kubernetes Storage – StorageClass and PVC
-
-**Objective:** Understand dynamic volume provisioning.
-
-First, inspect the available storage classes:
-
-```bash
-kubectl get storageclass
-kubectl get pv
-kubectl get pvc -A
-```
-
-Create `storage-pvc.yaml`:
-
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: app-storage
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: YOUR_STORAGE_CLASS
-```
-
-Replace `YOUR_STORAGE_CLASS` with an existing StorageClass in your cluster.
-
-Commands:
-
-```bash
-kubectl apply -f storage-pvc.yaml
-kubectl get pvc
-kubectl describe pvc app-storage
-kubectl get pv
-```
-
-Tasks:
-
-- Understand dynamic provisioning.
-- Check PVC binding status.
-- Attach the PVC to a Pod.
-- Write a file into the mounted volume.
-- Delete and recreate the Pod and verify persistence.
-
-**Important:** A StorageClass and suitable storage provisioner must exist. For EKS, understand the EBS CSI driver and its permissions.
-
-## 6. Volume Snapshots
-
-Understand how Kubernetes volume snapshots support backup and recovery.
-
-Tasks:
-
-- Learn VolumeSnapshot and VolumeSnapshotClass.
-- Check whether the CSI driver supports snapshots.
-- Create a VolumeSnapshot from a PVC.
-- Understand how to restore a PVC from a snapshot.
-
-Commands:
-
-```bash
-kubectl get volumesnapshotclass
-kubectl get volumesnapshot -A
-```
-
-**Note:** Snapshot resources require a compatible CSI driver and snapshot controller. Do not assume they are available in every cluster.
-
-## 7. Kubernetes Admission Controllers
-
-**Objective:** Understand how Kubernetes validates or modifies API requests.
+**Objective:** Understand producer delivery reliability.
 
 Learn:
 
-- Mutating Admission Webhooks
-- Validating Admission Webhooks
-- Built-in admission controllers
-- Kyverno
-- OPA Gatekeeper
+**acks=0**
+- Producer does not wait for broker acknowledgment.
+- Lower latency but weaker delivery guarantees.
+
+**acks=1**
+- Producer waits for acknowledgment from the partition leader.
+- A leader failure before replication can result in data loss.
+
+**acks=all**
+- Producer waits for acknowledgment from all currently required in-sync replicas.
+- Provides stronger durability when configured with suitable replication and `min.insync.replicas`.
 
 Tasks:
 
-- Understand the API request lifecycle.
-- Learn how a policy can block privileged containers.
-- Understand how a mutating webhook can add default labels.
-- Review a simple Kyverno policy that rejects Pods running as root.
+- Understand producer reliability.
+- Learn the relationship between replication factor and acknowledgments.
+- Understand retries and idempotent producers.
+- Compare latency and durability trade-offs.
 
-**Interview question:** What happens when a Pod creation request reaches the Kubernetes API Server?
+## 10. Kafka Topic Retention and Log Management
 
-## 8. Kubernetes Cluster Backup and etcd
+**Objective:** Understand how Kafka manages stored messages.
 
-**Objective:** Understand how cluster state is protected.
-
-Learn:
-
-- What data etcd stores.
-- Why etcd backup is important.
-- Snapshot and restore concepts.
-- Backup validation.
-- Velero and Kubernetes resource backups.
-
-For a self-managed control plane, explore:
+Describe topic configuration:
 
 ```bash
-kubectl get pods -n kube-system
-kubectl get endpoints -n default
+kafka-configs.sh \
+  --bootstrap-server localhost:9092 \
+  --entity-type topics \
+  --entity-name pathnex-events \
+  --describe
 ```
 
-If you have access to a control-plane node, study the etcd snapshot workflow:
+Understand:
 
-```bash
-ETCDCTL_API=3 etcdctl snapshot save snapshot.db
-ETCDCTL_API=3 etcdctl snapshot status snapshot.db
-```
-
-**Important:** These etcd commands require access to the etcd endpoint, valid certificates and appropriate permissions. They are not normally executed from an ordinary application Pod or a managed EKS worker node.
-
-## 9. Kubernetes Cluster Upgrade
-
-**Objective:** Understand the production upgrade workflow.
-
-Study the following sequence:
-
-1. Check current Kubernetes version.
-2. Review release notes and version compatibility.
-3. Check cluster health and workloads.
-4. Back up important cluster data.
-5. Upgrade the control plane.
-6. Upgrade worker nodes.
-7. Drain and upgrade nodes safely.
-8. Validate workloads and services.
-
-Commands:
-
-```bash
-kubectl version
-kubectl get nodes
-kubectl get pods -A
-kubectl get deployments -A
-kubectl get events -A --sort-by=.metadata.creationTimestamp
-```
-
-For EKS, study the managed control plane upgrade process and managed node group updates separately.
-
-## 10. Kubernetes DNS Troubleshooting
-
-**Objective:** Troubleshoot service discovery issues.
-
-Commands:
-
-```bash
-kubectl get pods -n kube-system
-kubectl get services -n kube-system
-kubectl logs -n kube-system -l k8s-app=kube-dns
-```
-
-Run a DNS test Pod:
-
-```bash
-kubectl run dns-test \
-  --image=busybox:1.36 \
-  --restart=Never \
-  --command -- sleep 3600
-```
-
-Test DNS resolution:
-
-```bash
-kubectl exec dns-test -- nslookup kubernetes.default
-kubectl exec dns-test -- nslookup YOUR_SERVICE.YOUR_NAMESPACE.svc.cluster.local
-```
+- Retention time.
+- Retention size.
+- Log segments.
+- Log compaction.
+- Disk utilization.
+- Data cleanup policies.
 
 Tasks:
 
-- Understand CoreDNS.
-- Check DNS resolution from a Pod.
-- Troubleshoot service name resolution failures.
-- Understand how DNS issues can affect microservices.
+- Understand how long Kafka retains messages.
+- Learn the difference between delete and compact cleanup policies.
+- Understand how retention affects disk usage.
 
-## 11. Production-Level SRE Troubleshooting Scenarios
+## 11. Kafka Monitoring and SRE Troubleshooting
 
-Practice explaining the investigation and resolution approach for these incidents:
+**Objective:** Understand Kafka monitoring from an SRE perspective.
 
-**Scenario 1: PVC is stuck in Pending**
+Important monitoring metrics:
 
-- Check PVC and StorageClass.
-- Inspect events.
-- Verify CSI provisioner health.
-- Check storage permissions and availability.
+**Broker metrics**
+- Broker availability.
+- Under-replicated partitions.
+- Offline partitions.
+- Request latency.
+- Network throughput.
+- Disk utilization.
 
-**Scenario 2: Pods are failing after a security policy change**
+**Consumer metrics**
+- Consumer lag.
+- Records consumed per second.
+- Processing latency.
+- Rebalance frequency.
+- Offset commit failures.
 
-- Check Pod events.
-- Review Pod Security Standards.
-- Inspect Security Context.
-- Identify the restricted permission.
-- Apply the approved security configuration.
+**Producer metrics**
+- Records sent per second.
+- Request latency.
+- Failed sends.
+- Retry rate.
+- Record error rate.
 
-**Scenario 3: Application cannot communicate with another service**
+Useful commands:
 
-- Check Pod status and endpoints.
-- Verify Service selectors.
-- Test DNS resolution.
-- Inspect NetworkPolicy rules.
-- Review application logs.
+```bash
+# Check topic details
+kafka-topics.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --topic pathnex-events
 
-**Scenario 4: Kubernetes node upgrade caused application downtime**
+# Check consumer groups
+kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --list
 
-- Check node status and Pod distribution.
-- Review drain and eviction events.
-- Inspect Pod Disruption Budgets.
-- Verify replica availability.
-- Validate application health after the upgrade.
+# Check consumer lag
+kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --group pathnex-consumer-group
+```
 
-**Scenario 5: Kubernetes cluster state needs recovery**
+Understand how Kafka metrics can be monitored using Prometheus, Grafana and JMX-based exporters.
 
-- Identify the backup source.
-- Validate snapshot integrity.
-- Understand etcd restoration requirements.
-- Follow the cluster-specific recovery procedure.
-- Verify API Server and workload health.
+## 12. Kafka Connect and Kafka Streams
 
-## 12. Daily Completion Checklist
+**Objective:** Understand Kafka's data integration and stream-processing ecosystem.
 
-- [ ] Practiced Security Context.
-- [ ] Understood Pod Security Standards.
-- [ ] Created ResourceQuota and LimitRange.
-- [ ] Practiced StorageClass and PVC.
-- [ ] Studied VolumeSnapshots.
-- [ ] Understood Admission Controllers.
-- [ ] Studied etcd backup and restore.
-- [ ] Revised cluster upgrade workflow.
-- [ ] Practiced Kubernetes DNS troubleshooting.
-- [ ] Prepared answers for 5 production SRE scenarios.
+Kafka Connect:
 
-**Recommended practice order:** Security Context → ResourceQuota → LimitRange → Storage/PVC → DNS troubleshooting → Admission Controllers → Backup/Restore → Cluster Upgrade.
+- Understand source connectors.
+- Understand sink connectors.
+- Learn how databases can publish events to Kafka.
+- Learn how Kafka data can be delivered to external systems.
 
-**Important:** Use a local test cluster or a dedicated non-production environment. Do not perform etcd restore, cluster upgrades, or destructive storage operations on production infrastructure.
+Kafka Streams:
+
+- Understand real-time data transformation.
+- Learn filtering and aggregation.
+- Understand stream joins.
+- Learn windowing concepts.
+
+Tasks:
+
+- Understand the difference between Kafka Connect and Kafka Streams.
+- Identify common real-time integration use cases.
+- Understand how these components fit into Kafka architecture.
+
+## 13. Real-Time SRE Troubleshooting Scenarios
+
+**Scenario 1: Consumer lag is continuously increasing**
+
+Investigate:
+
+- Consumer processing speed.
+- Number of partitions.
+- Number of consumers.
+- Broker performance.
+- Consumer application errors.
+
+**Scenario 2: Kafka broker becomes unavailable**
+
+Investigate:
+
+- Broker health.
+- Network connectivity.
+- Disk space.
+- Broker logs.
+- Partition leader availability.
+- Replication status.
+
+**Scenario 3: Under-replicated partitions**
+
+Investigate:
+
+- Broker availability.
+- Network connectivity.
+- Replica synchronization.
+- Disk I/O.
+- ISR membership.
+
+**Scenario 4: Producer is unable to publish messages**
+
+Investigate:
+
+- Bootstrap server connectivity.
+- Topic existence.
+- Broker health.
+- Authentication and authorization.
+- Producer errors and retries.
+
+**Scenario 5: Messages are not appearing in the consumer**
+
+Investigate:
+
+- Correct topic and partition.
+- Consumer group assignment.
+- Consumer offsets.
+- Consumer application logs.
+- Message filtering and processing logic.
+
+## 14. Daily Completion Checklist
+
+- [ ] Understood Kafka architecture.
+- [ ] Learned Producers, Consumers and Brokers.
+- [ ] Created Kafka topics.
+- [ ] Practiced topic partitions.
+- [ ] Produced and consumed messages.
+- [ ] Practiced consumer groups.
+- [ ] Understood Kafka offsets.
+- [ ] Learned replication and ISR.
+- [ ] Understood producer acknowledgments.
+- [ ] Studied retention and log management.
+- [ ] Learned Kafka monitoring metrics.
+- [ ] Prepared 5 Kafka SRE troubleshooting scenarios.
+
+**Recommended learning sequence:**
+
+Kafka Architecture → Topics → Partitions → Producer → Consumer → Consumer Groups → Offsets → Replication → Monitoring → Troubleshooting.
+
+**Learning objective:** Understand how Kafka handles real-time data streaming and develop the practical knowledge needed to monitor, troubleshoot and support Kafka-based production environments.
