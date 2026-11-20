@@ -1,0 +1,557 @@
+# Day 07 – Advanced Kubernetes Concepts & Coding Practice
+
+## 1. Kubernetes Resource Management – Requests & Limits
+
+Understand how Kubernetes allocates CPU and memory resources to containers.
+
+1. Understand CPU requests and memory requests.
+2. Understand CPU limits and memory limits.
+3. Learn how Kubernetes schedules Pods based on resource requests.
+4. Understand CPU throttling and memory pressure.
+5. Understand QoS classes:
+   - Guaranteed
+   - Burstable
+   - BestEffort
+6. Understand OOMKilled and exit code 137.
+7. Learn how to troubleshoot resource-intensive workloads.
+8. Understand resource allocation at Pod and container levels.
+
+**Hands-on Practice:**
+
+Create a resource configuration:
+
+```bash
+nano resource-pod.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-pod
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "500m"
+          memory: "256Mi"
+```
+
+Execute:
+
+```bash
+kubectl apply -f resource-pod.yaml
+kubectl get pod resource-pod
+kubectl describe pod resource-pod
+kubectl top pod resource-pod
+kubectl delete -f resource-pod.yaml
+```
+
+## 2. Horizontal Pod Autoscaler (HPA) & Vertical Pod Autoscaler (VPA)
+
+Understand how Kubernetes automatically adjusts application resources.
+
+1. What is Horizontal Pod Autoscaling?
+2. Understand how HPA increases or decreases Pod replicas.
+3. Understand CPU and memory utilization targets.
+4. Learn how Metrics Server provides resource metrics.
+5. Understand the difference between HPA and VPA.
+6. Learn how VPA recommends or adjusts resource requests.
+7. Understand scaling behavior and stabilization windows.
+8. Learn how to troubleshoot HPA when scaling does not happen.
+
+**Hands-on Practice:**
+
+Create a Deployment:
+
+```bash
+kubectl create deployment nginx --image=nginx
+kubectl scale deployment nginx --replicas=1
+```
+
+Configure HPA:
+
+```bash
+kubectl autoscale deployment nginx --cpu-percent=50 --min=1 --max=5
+```
+
+Verify:
+
+```bash
+kubectl get hpa
+kubectl describe hpa nginx
+kubectl get pods
+kubectl top pods
+```
+
+**Task:**
+- Install Metrics Server if required.
+- Configure CPU-based autoscaling.
+- Generate test load.
+- Observe replica count changes.
+- Understand why HPA may show unknown metrics.
+
+## 3. Kubernetes Scheduling – Advanced Concepts
+
+Understand how Kubernetes decides where Pods should run.
+
+1. Understand Node Selector.
+2. Understand Node Affinity and Anti-Affinity.
+3. Understand Pod Affinity and Anti-Affinity.
+4. Understand Taints and Tolerations.
+5. Understand node labels and scheduling constraints.
+6. Learn the role of PriorityClass and Pod Priority.
+7. Understand Pod topology spread constraints.
+8. Learn how resource availability affects scheduling.
+9. Understand how to troubleshoot Pods stuck in Pending state.
+
+**Hands-on Practice:**
+
+Check nodes and labels:
+
+```bash
+kubectl get nodes --show-labels
+kubectl describe nodes
+```
+
+Label a node:
+
+```bash
+kubectl label nodes NODE_NAME environment=production
+```
+
+Create a Pod using Node Selector:
+
+```bash
+nano node-selector.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-node-selector
+spec:
+  nodeSelector:
+    environment: production
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+Execute:
+
+```bash
+kubectl apply -f node-selector.yaml
+kubectl get pods -o wide
+kubectl describe pod nginx-node-selector
+```
+
+## 4. Kubernetes Security – RBAC & Service Accounts
+
+Understand how access and permissions are controlled in Kubernetes.
+
+1. Understand Role-Based Access Control (RBAC).
+2. Understand Roles and ClusterRoles.
+3. Understand RoleBindings and ClusterRoleBindings.
+4. Understand Kubernetes Service Accounts.
+5. Learn the difference between Role and ClusterRole.
+6. Understand least-privilege access.
+7. Learn Kubernetes authentication and authorization.
+8. Understand service account token management.
+9. Learn how to audit access permissions.
+10. Understand security risks associated with excessive permissions.
+
+**Hands-on Practice:**
+
+Create a Service Account:
+
+```bash
+kubectl create serviceaccount dev-user
+kubectl get serviceaccounts
+```
+
+Create a Role:
+
+```bash
+nano pod-reader-role.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+```
+
+Create a RoleBinding:
+
+```bash
+nano pod-reader-binding.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-reader-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: dev-user
+    namespace: default
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f pod-reader-role.yaml
+kubectl apply -f pod-reader-binding.yaml
+kubectl auth can-i list pods --as=system:serviceaccount:default:dev-user
+kubectl auth can-i delete pods --as=system:serviceaccount:default:dev-user
+```
+
+## 5. Kubernetes Network Policies
+
+Understand how network traffic is controlled between Pods.
+
+1. What is a Kubernetes NetworkPolicy?
+2. Understand Ingress and Egress traffic rules.
+3. Learn Pod selectors and namespace selectors.
+4. Understand how to restrict communication between applications.
+5. Learn default-deny network policies.
+6. Understand how NetworkPolicies improve cluster security.
+7. Learn the difference between Kubernetes Services and NetworkPolicies.
+8. Understand CNI plugin support for NetworkPolicies.
+
+**Hands-on Practice:**
+
+Create a NetworkPolicy:
+
+```bash
+nano network-policy.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access: allowed
+      ports:
+        - protocol: TCP
+          port: 80
+```
+
+Execute:
+
+```bash
+kubectl apply -f network-policy.yaml
+kubectl get networkpolicies
+kubectl describe networkpolicy allow-nginx-ingress
+```
+
+**Task:**
+- Create two test applications.
+- Apply a NetworkPolicy.
+- Test allowed and denied traffic.
+- Understand why a NetworkPolicy requires a compatible network plugin to enforce rules.
+
+## 6. Kubernetes Probes – Application Health Monitoring
+
+Understand how Kubernetes checks application health.
+
+1. What is a Liveness Probe?
+2. What is a Readiness Probe?
+3. What is a Startup Probe?
+4. Understand the difference between Liveness and Readiness.
+5. Understand initial delay, timeout and probe periods.
+6. Learn how failed probes affect container lifecycle.
+7. Understand how readiness probes control traffic to Pods.
+8. Troubleshoot containers restarting due to failed probes.
+
+**Hands-on Practice:**
+
+Create a probe configuration:
+
+```bash
+nano health-probe.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-health
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+```
+
+Execute:
+
+```bash
+kubectl apply -f health-probe.yaml
+kubectl describe pod nginx-health
+kubectl get pods
+kubectl get events
+```
+
+**Task:**
+- Configure all three probe types.
+- Simulate an application health-check failure.
+- Observe Pod restarts and readiness status.
+- Understand how probes help maintain application availability.
+
+## 7. Kubernetes Observability – Monitoring, Logging & Metrics
+
+Understand how to monitor Kubernetes clusters in production.
+
+1. Understand Kubernetes monitoring architecture.
+2. Learn the role of Prometheus.
+3. Understand Grafana dashboards.
+4. Understand Alertmanager and alert routing.
+5. Learn kube-state-metrics.
+6. Understand Metrics Server.
+7. Learn container and Pod resource monitoring.
+8. Understand centralized logging using ELK Stack.
+9. Understand Fluent Bit and Fluentd log collection.
+10. Monitor node health, Pod restarts and application latency.
+11. Understand Kubernetes events and alert severity.
+12. Learn how to correlate application logs, metrics and traces.
+
+**Hands-on Practice:**
+
+Execute:
+
+```bash
+kubectl top nodes
+kubectl top pods -A
+kubectl get pods -A
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl describe nodes
+kubectl logs POD_NAME
+```
+
+**Task:**
+- Identify high CPU and memory utilization.
+- Check frequent Pod restarts.
+- Review Kubernetes events.
+- Understand how Prometheus collects metrics.
+- Explore Grafana dashboards for Kubernetes monitoring.
+
+## 8. Kubernetes Cluster Maintenance & Node Management
+
+Understand how to maintain Kubernetes worker nodes safely.
+
+1. Understand node lifecycle and node conditions.
+2. Learn how to cordon a node.
+3. Understand how to drain a node.
+4. Learn how to uncordon a node.
+5. Understand Pod eviction and rescheduling.
+6. Understand PodDisruptionBudgets (PDB).
+7. Learn how to perform node maintenance.
+8. Understand graceful application shutdown.
+9. Learn how to check node resource pressure.
+10. Understand cluster upgrades and version compatibility.
+
+**Hands-on Practice:**
+
+```bash
+kubectl get nodes
+kubectl cordon NODE_NAME
+kubectl describe node NODE_NAME
+kubectl drain NODE_NAME --ignore-daemonsets
+kubectl get pods -o wide
+kubectl uncordon NODE_NAME
+```
+
+**Task:**
+- Cordon a worker node.
+- Understand how scheduling is prevented on that node.
+- Drain it and observe Pod rescheduling.
+- Uncordon the node.
+- Understand why PodDisruptionBudgets are important during maintenance.
+
+Note: Perform drain exercises only in a disposable cluster with sufficient healthy nodes. Do not drain a production node without checking workloads and disruption budgets.
+
+## 9. Kubernetes Helm – Package Management
+
+Understand how Helm simplifies Kubernetes application deployment.
+
+1. What is Helm?
+2. Understand Helm Charts and Chart structure.
+3. Understand values.yaml.
+4. Learn Helm templates.
+5. Understand Helm Releases.
+6. Learn how to install applications using Helm.
+7. Understand Helm upgrade and rollback.
+8. Learn how to manage chart repositories.
+9. Understand Helm dependency management.
+10. Learn how Helm supports repeatable application deployments.
+
+**Hands-on Practice:**
+
+```bash
+helm version
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm search repo nginx
+helm list -A
+```
+
+Install an available chart:
+
+```bash
+helm install my-nginx CHART_NAME
+helm list
+helm status my-nginx
+helm upgrade my-nginx CHART_NAME
+helm history my-nginx
+helm rollback my-nginx 1
+helm uninstall my-nginx
+```
+
+**Task:**
+- Install Helm.
+- Add a chart repository.
+- Explore a chart's values.
+- Install an application.
+- Upgrade and roll back a release.
+
+Replace CHART_NAME with an actual chart reference available in your configured repository.
+
+## 10. Kubernetes Backup & Disaster Recovery
+
+Understand how Kubernetes cluster recovery works.
+
+1. Understand Kubernetes cluster state.
+2. Learn the role of etcd in cluster backup.
+3. Understand etcd snapshots.
+4. Learn the difference between application backup and cluster backup.
+5. Understand PersistentVolume data backup.
+6. Learn recovery planning for failed workloads.
+7. Understand configuration backup using Git.
+8. Explore Velero for Kubernetes backup and restore.
+9. Understand Recovery Point Objective (RPO) and Recovery Time Objective (RTO).
+10. Learn how to validate backup and restore procedures.
+
+**Task:**
+- Understand etcd backup and restore concepts.
+- Explore Velero architecture.
+- Identify which application data requires persistent backups.
+- Create a basic Kubernetes YAML backup in Git.
+- Understand a disaster recovery scenario.
+
+## 11. AWS EKS – Advanced Kubernetes Concepts
+
+Understand how Kubernetes operates in AWS environments.
+
+1. Understand Amazon EKS architecture.
+2. Learn the difference between the EKS Control Plane and Worker Nodes.
+3. Understand Managed Node Groups.
+4. Learn EKS Fargate Profiles.
+5. Understand IAM Roles for Service Accounts (IRSA).
+6. Understand EKS Pod Identity.
+7. Learn the AWS Load Balancer Controller.
+8. Understand EBS CSI Driver and persistent storage.
+9. Learn ECR integration for container images.
+10. Understand VPC CNI and Pod networking.
+11. Learn EKS cluster autoscaling concepts.
+12. Understand Cluster Autoscaler and Karpenter.
+13. Learn EKS logging and CloudWatch integration.
+14. Understand EKS upgrades and node group maintenance.
+
+**Task:**
+- Understand how an EKS Pod receives permissions through an IAM role.
+- Trace application traffic through an AWS load balancer to a Kubernetes Service and Pod.
+- Understand how ECR images are pulled by worker nodes.
+- Explore how EBS volumes are attached to Pods.
+- Understand the difference between scaling Pods and scaling worker nodes.
+
+## 12. Real-Time Advanced SRE & DevOps Scenarios
+
+1. HPA is configured, but Pods are not scaling. How would you troubleshoot it?
+2. A Pod is repeatedly getting OOMKilled. How would you investigate and resolve it?
+3. A Pod is running but failing its readiness probe. What would you check?
+4. Production Pods are scheduled on the same worker node. How would you distribute workloads?
+5. A worker node needs maintenance without causing application downtime. What steps would you follow?
+6. A developer requires access to view Pods but should not delete them. How would you configure RBAC?
+7. One application should communicate with another only on a specific port. How would you enforce this?
+8. Kubernetes nodes show high memory pressure. How would you investigate?
+9. A production application becomes unavailable after a deployment. How would you troubleshoot and recover?
+10. How would you monitor Kubernetes using Prometheus and Grafana?
+11. An application needs more replicas, but the cluster has insufficient CPU and memory. How would you investigate?
+12. How would you troubleshoot an EKS application that cannot access an AWS service?
+13. A node drain operation is blocked by a PodDisruptionBudget. What would you investigate?
+14. How would you recover application workloads after a cluster failure?
+15. How would you securely manage IAM permissions for applications running in EKS?
+
+## Daily Completion Checklist
+
+- [ ] Understand Kubernetes resource requests, limits and QoS classes.
+- [ ] Configure and test HPA.
+- [ ] Practice Node Affinity, Taints and Tolerations.
+- [ ] Create RBAC Roles and RoleBindings.
+- [ ] Configure a NetworkPolicy.
+- [ ] Configure Liveness, Readiness and Startup Probes.
+- [ ] Practice Kubernetes monitoring commands.
+- [ ] Perform a node cordon and drain exercise in a test cluster.
+- [ ] Understand Helm installation, upgrade and rollback.
+- [ ] Study Kubernetes backup and disaster recovery.
+- [ ] Understand advanced AWS EKS architecture.
+- [ ] Complete at least five production troubleshooting scenarios.
+- [ ] Save YAML manifests, commands, outputs and learnings in GitHub.
+
+**Important:** Focus on understanding how each component works in a real production environment.

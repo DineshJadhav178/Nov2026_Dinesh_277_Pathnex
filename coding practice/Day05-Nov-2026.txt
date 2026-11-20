@@ -1,0 +1,478 @@
+# Day 05 – Kubernetes Coding Practice
+
+## 1. Kubernetes Namespaces – Command Practice
+
+Practice the following commands:
+
+```bash
+kubectl get namespaces
+kubectl create namespace dev
+kubectl create namespace staging
+kubectl get ns
+kubectl describe namespace dev
+kubectl config set-context --current --namespace=dev
+kubectl config view --minify | grep namespace
+kubectl delete namespace staging
+```
+
+**Task:**
+- Create `dev`, `staging` and `production` namespaces.
+- List all available namespaces.
+- Deploy an application inside the `dev` namespace.
+- Verify that resources are isolated between namespaces.
+- Switch between namespaces and delete the test namespace.
+
+## 2. Pods – Create and Manage Pods
+
+Create a Pod using an imperative command:
+
+```bash
+kubectl run nginx-pod --image=nginx
+kubectl get pods
+kubectl describe pod nginx-pod
+kubectl logs nginx-pod
+kubectl exec -it nginx-pod -- /bin/bash
+kubectl delete pod nginx-pod
+```
+
+Create a YAML file:
+
+```bash
+nano pod.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+      ports:
+        - containerPort: 80
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f pod.yaml
+kubectl get pods -o wide
+kubectl describe pod nginx-pod
+kubectl delete -f pod.yaml
+```
+
+**Task:**
+- Create a Pod using the command line.
+- Create another Pod using YAML.
+- Check Pod status, IP address and node assignment.
+- View container logs and execute commands inside the Pod.
+
+## 3. Deployments & ReplicaSets
+
+Create a Deployment:
+
+```bash
+kubectl create deployment nginx --image=nginx --replicas=2
+kubectl get deployments
+kubectl get replicasets
+kubectl get pods
+kubectl describe deployment nginx
+```
+
+Scale the Deployment:
+
+```bash
+kubectl scale deployment nginx --replicas=4
+kubectl get pods
+```
+
+Update the image:
+
+```bash
+kubectl set image deployment/nginx nginx=nginx:1.27
+kubectl rollout status deployment/nginx
+```
+
+Check rollout history and rollback:
+
+```bash
+kubectl rollout history deployment/nginx
+kubectl rollout undo deployment/nginx
+```
+
+Create a YAML manifest:
+
+```bash
+nano deployment.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl get deployments
+kubectl get replicasets
+kubectl get pods -o wide
+```
+
+**Task:**
+- Create a Deployment with three replicas.
+- Scale it to five replicas.
+- Update the container image.
+- Perform a rollout rollback.
+- Delete one Pod and observe how Kubernetes creates a replacement.
+
+## 4. Kubernetes Services – Networking Practice
+
+Create a ClusterIP Service:
+
+```bash
+kubectl expose deployment nginx --name=nginx-clusterip --port=80 --target-port=80 --type=ClusterIP
+kubectl get services
+kubectl describe service nginx-clusterip
+```
+
+Create a NodePort Service using YAML:
+
+```bash
+nano nodeport.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+```
+
+Apply:
+
+```bash
+kubectl apply -f nodeport.yaml
+kubectl get svc
+kubectl describe svc nginx-nodeport
+```
+
+Create a LoadBalancer Service:
+
+```bash
+kubectl expose deployment nginx --name=nginx-lb --port=80 --target-port=80 --type=LoadBalancer
+kubectl get svc -w
+```
+
+Practice:
+1. Create ClusterIP, NodePort and LoadBalancer Services.
+2. Understand the role of selectors and labels.
+3. Verify Service endpoints.
+4. Test application connectivity.
+5. Understand how Services distribute traffic across Pods.
+
+Note: A LoadBalancer Service in a local cluster may remain pending if no cloud or load-balancer integration is configured. On AWS EKS, cloud integration is required.
+
+## 5. ConfigMaps & Secrets
+
+Create a ConfigMap:
+
+```bash
+kubectl create configmap app-config --from-literal=APP_ENV=development
+kubectl get configmaps
+kubectl describe configmap app-config
+```
+
+Create a Secret:
+
+```bash
+kubectl create secret generic app-secret --from-literal=DB_USER=admin
+kubectl get secrets
+kubectl describe secret app-secret
+```
+
+Create a YAML file:
+
+```bash
+nano configmap.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-settings
+data:
+  APP_ENV: development
+  LOG_LEVEL: info
+```
+
+Apply:
+
+```bash
+kubectl apply -f configmap.yaml
+kubectl get configmap app-settings -o yaml
+```
+
+**Task:**
+- Create a ConfigMap.
+- Create a Secret using test credentials only.
+- Understand how environment variables are injected into containers.
+- Practice mounting configuration files into Pods.
+
+Important: Kubernetes Secrets are base64-encoded by default, not automatically encrypted. Never commit real credentials to GitHub.
+
+## 6. StatefulSets & Persistent Volumes
+
+Create a PersistentVolumeClaim:
+
+```bash
+nano pvc.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f pvc.yaml
+kubectl get pvc
+kubectl describe pvc app-pvc
+```
+
+Practice:
+1. Understand PersistentVolumes and PersistentVolumeClaims.
+2. Create a PVC.
+3. Understand storage classes.
+4. Learn how Pods mount persistent storage.
+5. Understand StatefulSets and stable Pod identities.
+6. Explore StatefulSet scaling and ordered deployment.
+
+Note: A PVC needs a suitable StorageClass or pre-created PersistentVolume. In a local cluster, configure a storage provisioner if required.
+
+## 7. DaemonSets, Jobs & CronJobs
+
+Check existing DaemonSets:
+
+```bash
+kubectl get daemonsets -A
+kubectl describe daemonset -n kube-system
+```
+
+Create a Job:
+
+```bash
+kubectl create job hello-job --image=busybox -- echo "Hello Kubernetes"
+kubectl get jobs
+kubectl get pods
+kubectl logs job/hello-job
+```
+
+Create a CronJob:
+
+```bash
+nano cronjob.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-cronjob
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: hello
+              image: busybox
+              command:
+                - /bin/sh
+                - -c
+                - echo "Kubernetes CronJob executed"
+          restartPolicy: OnFailure
+```
+
+Apply:
+
+```bash
+kubectl apply -f cronjob.yaml
+kubectl get cronjobs
+kubectl get jobs
+kubectl get pods
+```
+
+**Task:**
+- Understand DaemonSet use cases for monitoring and logging agents.
+- Create a Job that runs a simple command.
+- Create a CronJob that executes every five minutes.
+- Check execution history and logs.
+
+## 8. Ingress – Traffic Routing Practice
+
+Understand Ingress resources and Ingress Controllers.
+
+Create an Ingress YAML file:
+
+```bash
+nano ingress.yaml
+```
+
+Add:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: demo.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-clusterip
+                port:
+                  number: 80
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f ingress.yaml
+kubectl get ingress
+kubectl describe ingress nginx-ingress
+```
+
+Practice:
+1. Understand the role of an Ingress Controller.
+2. Configure host-based routing.
+3. Understand path-based routing.
+4. Learn TLS configuration for HTTPS.
+5. Understand how Ingress routes traffic to Services.
+
+Note: Creating an Ingress resource alone does not provide traffic routing. An Ingress Controller must be installed and configured.
+
+## 9. Essential Kubernetes Troubleshooting Commands
+
+Practice these commands:
+
+```bash
+kubectl get nodes
+kubectl get pods -A
+kubectl get deployments
+kubectl get services
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl describe pod POD_NAME
+kubectl logs POD_NAME
+kubectl logs POD_NAME --previous
+kubectl exec -it POD_NAME -- /bin/sh
+kubectl top nodes
+kubectl top pods
+kubectl get endpoints
+kubectl get ingress
+```
+
+Troubleshooting exercises:
+
+1. Pod is stuck in Pending state.
+2. Pod enters CrashLoopBackOff.
+3. Container shows ImagePullBackOff.
+4. Pod is restarting due to OOMKilled.
+5. Service is not routing traffic to Pods.
+6. Deployment is not maintaining the desired replica count.
+7. PVC remains in Pending state.
+8. Ingress is not routing external traffic.
+9. Node status changes to NotReady.
+10. Application is experiencing high CPU or memory utilization.
+
+## 10. Real-Time SRE & DevOps Scenarios
+
+1. A production Pod is continuously restarting. How would you troubleshoot it?
+2. A Deployment has five desired replicas, but only three Pods are running. What would you check?
+3. A new application release causes production issues. How would you perform a rollback?
+4. Pods are running, but users cannot access the application. How would you investigate the Service and networking configuration?
+5. A Pod is stuck in Pending state. How would you identify scheduling or resource issues?
+6. An application is receiving OOMKilled errors. How would you investigate memory usage?
+7. A worker node becomes NotReady. What components and logs would you check?
+8. Application configuration needs to be updated without rebuilding the Docker image. How would you use ConfigMaps?
+9. How would you securely manage application credentials using Kubernetes Secrets?
+10. How would you expose an application running on AWS EKS to external users?
+11. How would you monitor Kubernetes Pods, Nodes and application performance?
+12. How would you troubleshoot an application when multiple microservices communicate with each other?
+
+## Daily Completion Checklist
+
+- [ ] Create and manage at least three Namespaces.
+- [ ] Create Pods using commands and YAML manifests.
+- [ ] Deploy an application with three replicas.
+- [ ] Practice scaling, rolling updates and rollback.
+- [ ] Create and test ClusterIP and NodePort Services.
+- [ ] Understand LoadBalancer and Ingress.
+- [ ] Create ConfigMaps and Secrets.
+- [ ] Understand PersistentVolumes and PVCs.
+- [ ] Practice Jobs and CronJobs.
+- [ ] Execute at least 10 Kubernetes troubleshooting commands.
+- [ ] Complete at least three SRE troubleshooting scenarios.
+- [ ] Save all YAML files, commands, outputs and learnings in GitHub.
+
+**Important:** Execute all commands practically in your local Kubernetes environment, such as Minikube, kind or Docker Desktop Kubernetes. For AWS EKS-specific LoadBalancer and cloud integration exercises, use an appropriately configured EKS cluster. Record actual outputs and errors rather than just copying commands.

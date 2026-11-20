@@ -1,0 +1,20 @@
+# Day 05 – Kubernetes Session Timing Log
+
+## What I did today:
+
+1. 1 hour – Kubernetes introduction, overview, use cases and container orchestration concepts.
+2. 1 hour – Kubernetes architecture revision: Control Plane, Worker Nodes and their components.
+3. 1 hour – Kubernetes core components: API Server, etcd, Controller Manager, Scheduler, Kubelet, Kube Proxy and Container Runtime.
+4. 1 hour – Kubernetes deployment workflow: Understanding how `kubectl`, API Server, etcd, Controllers, Scheduler and Kubelet work together.
+5. 30 minutes – Practical understanding of Pod creation, ReplicaSets, Deployments and desired-state management.
+6. 30 minutes – Kubernetes reconciliation loop, high availability, scaling and self-healing concepts.
+
+## Tomorrow's tasks:
+
+1. Kubernetes hands-on practice – Pods, Deployments and ReplicaSets.
+2. Practice essential `kubectl` commands and YAML manifests.
+3. Understand Kubernetes Services, ClusterIP, NodePort and LoadBalancer.
+4. Practice ConfigMaps, Secrets and Persistent Volumes.
+5. 1 hour – Python coding and automation practice.
+6. 1 hour – SRE interview questions and Kubernetes troubleshooting scenarios.
+7. English speaking and technical concept explanation practice.
