@@ -1,0 +1,21 @@
+# Day 06 – Kubernetes Session Timing Log
+
+## What I did today:
+
+1. 1 hour – Kubernetes Namespaces: Understanding resource organization, isolation, access management and default namespaces.
+2. 1 hour – Kubernetes Services: Understanding stable networking, service discovery, labels, selectors and communication between Pods.
+3. 1 hour – Kubernetes Service types: ClusterIP, NodePort, LoadBalancer, ExternalName and Headless Services, including their use cases in AWS EKS.
+4. 1 hour – Kubernetes Deployments and ReplicaSets: Understanding Pod lifecycle management, scaling, rolling updates, rollbacks and replica management.
+5. 1 hour – Kubernetes workload resources: Understanding StatefulSets, DaemonSets, Jobs and CronJobs with practical use cases.
+6. 1 hour – Kubernetes Ingress: Understanding external HTTP/HTTPS traffic routing, SSL termination and host-based/path-based routing.
+
+## Tomorrow's tasks:
+
+1. Kubernetes hands-on practice – Namespaces, Pods, Deployments and ReplicaSets.
+2. Create and test Kubernetes Services using ClusterIP, NodePort and LoadBalancer.
+3. Practice scaling, rolling updates and rollback operations.
+4. Create YAML manifests for StatefulSets, DaemonSets, Jobs and CronJobs.
+5. Understand Ingress configuration and traffic routing.
+6. 1 hour – Python coding and automation practice.
+7. 1 hour – SRE interview questions and Kubernetes troubleshooting scenarios.
+8. English speaking and technical concept explanation practice.
