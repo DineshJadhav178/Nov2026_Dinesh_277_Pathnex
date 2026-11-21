@@ -1,4 +1,4 @@
-# Day 07 – Advanced Kubernetes Concepts & Coding Practice
+# Day 07 – Advanced Kubernetes Concepts & Coding Practice:
 
 ## 1. Kubernetes Resource Management – Requests & Limits
 

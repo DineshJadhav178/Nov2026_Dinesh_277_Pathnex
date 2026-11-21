@@ -1,6 +1,6 @@
 # Day 06 – Kubernetes Session Timing Log
 
-## What I did today:
+##  What I did today:
 
 1. 1 hour – Kubernetes Namespaces: Understanding resource organization, isolation, access management and default namespaces.
 2. 1 hour – Kubernetes Services: Understanding stable networking, service discovery, labels, selectors and communication between Pods.
