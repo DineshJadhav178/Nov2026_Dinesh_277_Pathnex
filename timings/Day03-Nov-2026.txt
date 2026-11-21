@@ -1,6 +1,6 @@
 # Day 03 – Git & GitHub Practice
 
-## What I Did Today
+## What I Did Today:
 
 1. **1 Hour – Git Fundamentals**
    - Revised Git architecture and basic commands.
