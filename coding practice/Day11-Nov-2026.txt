@@ -1,4 +1,4 @@
-# Day 09 – Kubernetes Troubleshooting & Observability | Coding Practice
+# Day 11 – Kubernetes Troubleshooting & Observability | Coding Practice
 
 ## 1. EKS Cluster and Kubernetes Health Checks
 
