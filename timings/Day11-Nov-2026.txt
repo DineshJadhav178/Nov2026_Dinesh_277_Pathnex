@@ -1,0 +1,70 @@
+# Day 09 – Kubernetes Troubleshooting & Observability
+
+## Topics Covered
+
+### 1. AWS EKS Infrastructure and GitOps
+- Understanding AWS EKS cluster architecture and setup.
+- Introduction to ArgoCD and GitOps-based deployment.
+- Managing Kubernetes manifests through Git repositories.
+- Understanding ArgoCD sync policies and automated deployments.
+- Managing application configuration and Kubernetes Secrets securely.
+- Introduction to Cluster Autoscaler and automatic node scaling.
+
+### 2. Kubernetes Troubleshooting and Debugging
+- Troubleshooting failing Pods and Deployment crashes.
+- Understanding `kubectl describe pod` and Kubernetes events.
+- Analyzing application logs using `kubectl logs`.
+- Checking previous container logs using `kubectl logs --previous`.
+- Troubleshooting missing credentials and permission-denied errors.
+- Understanding CrashLoopBackOff, ImagePullBackOff and Pending Pods.
+
+### 3. New Relic Monitoring Integration
+- Introduction to New Relic infrastructure monitoring.
+- Understanding APM (Application Performance Monitoring).
+- Installing New Relic monitoring agents in Kubernetes.
+- Understanding eBPF-based instrumentation.
+- Monitoring application and infrastructure performance.
+- Understanding the role of DaemonSets in monitoring agents.
+
+### 4. Kubernetes Resource and Scheduling Troubleshooting
+- Understanding why Pods remain in Pending state.
+- Troubleshooting CPU and memory resource constraints.
+- Understanding resource requests and limits.
+- Analyzing Node Affinity and scheduling constraints.
+- Understanding DaemonSets and their role in cluster monitoring.
+- Checking node health and workload distribution.
+
+### 5. Alerting and Incident Management
+- Understanding monitoring thresholds and alert conditions.
+- Configuring email and Microsoft Teams notifications.
+- Introduction to PagerDuty for incident management.
+- Understanding alert escalation and on-call responsibilities.
+- Connecting monitoring alerts with production incident response.
+
+### 6. Real-Time SRE Troubleshooting
+- Identifying application and infrastructure failures.
+- Performing root cause analysis (RCA).
+- Understanding monitoring, logging and observability.
+- Learning to troubleshoot live failures instead of relying only on predefined commands.
+- Improving independent debugging and incident resolution skills.
+
+## Time Allocation
+
+| Topic | Duration |
+|---|---:|
+| AWS EKS, ArgoCD and GitOps | 1 hour |
+| Kubernetes Pod troubleshooting | 1 hour |
+| New Relic, APM and eBPF monitoring | 1 hour |
+| Resource management and scheduling | 1 hour |
+| Alerting and PagerDuty | 30 minutes |
+| SRE troubleshooting and RCA | 30 minutes |
+| **Total** | **5 hours** |
+
+## Tomorrow's Tasks
+1. Practice Kubernetes Pod troubleshooting and debugging scenarios.
+2. Deploy an application using ArgoCD and GitOps.
+3. Practice New Relic monitoring and Kubernetes infrastructure metrics.
+4. Understand DaemonSets, resource requests, limits and Cluster Autoscaler.
+5. Practice CrashLoopBackOff, Pending Pods and permission-related issues.
+6. Prepare SRE interview questions on monitoring and observability.
+7. Practice explaining production incidents in English.

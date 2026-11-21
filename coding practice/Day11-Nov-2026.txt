@@ -1,0 +1,305 @@
+# Day 09 – Kubernetes Troubleshooting & Observability | Coding Practice
+
+## 1. EKS Cluster and Kubernetes Health Checks
+
+Practice the following commands:
+
+```bash
+# Check EKS clusters
+eksctl get cluster --region <region>
+
+# Check Kubernetes cluster information
+kubectl cluster-info
+
+# Check worker nodes
+kubectl get nodes -o wide
+
+# Check all namespaces
+kubectl get namespaces
+
+# Check all pods across namespaces
+kubectl get pods -A
+
+# Check system components
+kubectl get pods -n kube-system
+
+# Check node resource utilization (requires Metrics Server)
+kubectl top nodes
+
+# Check pod resource utilization
+kubectl top pods -A
+```
+
+**Practice tasks:**
+- Verify cluster and node health.
+- Identify unhealthy or NotReady nodes.
+- Check system components.
+- Monitor CPU and memory utilization.
+
+## 2. Kubernetes Pod Troubleshooting
+
+Create a sample deployment:
+
+```bash
+kubectl create deployment nginx \
+  --image=nginx --replicas=2
+
+# Check deployment
+kubectl get deployments
+
+# Check pods
+kubectl get pods -o wide
+
+# Describe a pod
+kubectl describe pod <pod-name>
+
+# Check application logs
+kubectl logs <pod-name>
+
+# Check previous container logs
+kubectl logs <pod-name> --previous
+
+# Check recent cluster events
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+
+**Practice scenarios:**
+1. Troubleshoot CrashLoopBackOff.
+2. Troubleshoot ImagePullBackOff.
+3. Investigate Pending Pods.
+4. Identify missing credentials and permission errors.
+5. Analyze container restart reasons.
+
+## 3. Resource Requests and Limits
+
+Create a sample YAML file:
+
+`resource-pod.yaml`
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-demo
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+```
+
+Apply and validate:
+
+```bash
+kubectl apply -f resource-pod.yaml
+
+kubectl get pods
+
+kubectl describe pod resource-demo
+
+kubectl top pod resource-demo
+```
+
+**Practice tasks:**
+- Understand CPU and memory requests.
+- Understand resource limits.
+- Troubleshoot insufficient CPU and memory.
+- Understand OOMKilled and CPU throttling.
+
+## 4. DaemonSet Practice
+
+Create a DaemonSet YAML:
+
+`monitoring-daemonset.yaml`
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: monitoring-agent
+spec:
+  selector:
+    matchLabels:
+      app: monitoring-agent
+  template:
+    metadata:
+      labels:
+        app: monitoring-agent
+    spec:
+      containers:
+        - name: agent
+          image: busybox
+          command: ["sh", "-c", "sleep 3600"]
+```
+
+Execute:
+
+```bash
+kubectl apply -f monitoring-daemonset.yaml
+
+kubectl get daemonsets
+
+kubectl get pods -o wide
+
+kubectl describe daemonset monitoring-agent
+
+kubectl delete -f monitoring-daemonset.yaml
+```
+
+**Practice tasks:**
+- Understand how DaemonSets schedule Pods.
+- Check whether a Pod runs on each eligible node.
+- Understand monitoring agent deployment.
+- Troubleshoot DaemonSet scheduling issues.
+
+## 5. Cluster Autoscaler and Node Management
+
+Practice these commands:
+
+```bash
+# Check nodes
+kubectl get nodes
+
+# Check node details
+kubectl describe node <node-name>
+
+# Check pending pods
+kubectl get pods -A --field-selector=status.phase=Pending
+
+# Check node resource usage
+kubectl top nodes
+
+# Check autoscaler deployment
+kubectl get deployments -n kube-system
+
+# Check autoscaler logs, if installed
+kubectl logs -n kube-system deployment/cluster-autoscaler
+```
+
+**Practice tasks:**
+- Understand when Cluster Autoscaler adds nodes.
+- Understand when it removes underutilized nodes.
+- Identify scheduling constraints.
+- Troubleshoot Pods pending due to insufficient resources.
+
+Note: Cluster Autoscaler must be configured with appropriate AWS IAM permissions and node group discovery settings.
+
+## 6. ArgoCD and GitOps Practice
+
+Practice these commands after installing ArgoCD:
+
+```bash
+# Check ArgoCD namespace
+kubectl get pods -n argocd
+
+# Check ArgoCD services
+kubectl get svc -n argocd
+
+# Install ArgoCD CLI if required
+argocd version
+
+# Login to ArgoCD
+argocd login <argocd-server>
+
+# List applications
+argocd app list
+
+# Check application status
+argocd app get <application-name>
+
+# Synchronize application
+argocd app sync <application-name>
+
+# Check application history
+argocd app history <application-name>
+```
+
+**Practice tasks:**
+- Connect a Git repository to ArgoCD.
+- Deploy an application using Kubernetes YAML manifests.
+- Understand automated and manual sync.
+- Troubleshoot OutOfSync and SyncFailed states.
+- Understand GitOps-based deployment workflows.
+
+## 7. New Relic Monitoring Practice
+
+Understand and practice the following:
+
+1. Deploy a Kubernetes monitoring agent using the official New Relic Helm chart.
+2. Configure the required New Relic license key securely.
+3. Verify the monitoring agent Pods.
+4. Check infrastructure metrics.
+5. Understand APM integration.
+6. Explore eBPF-based instrumentation.
+7. Create alerts for CPU and memory utilization.
+8. Understand application response time and error-rate monitoring.
+
+Useful commands:
+
+```bash
+# Check monitoring namespace
+kubectl get namespaces
+
+# Check monitoring agent pods
+kubectl get pods -A | grep -i newrelic
+
+# Check monitoring deployments
+kubectl get deployments -A | grep -i newrelic
+
+# Check monitoring DaemonSets
+kubectl get daemonsets -A | grep -i newrelic
+
+# Inspect monitoring agent logs
+kubectl logs <pod-name> -n <namespace>
+```
+
+## 8. Real-Time SRE Troubleshooting Scenarios
+
+Practice solving the following:
+
+1. An application Pod is continuously restarting. How would you identify the root cause?
+2. A Pod is stuck in Pending state. How would you troubleshoot resource constraints?
+3. An application is running but not receiving traffic. What would you check?
+4. New Relic is not showing metrics from one worker node. How would you investigate?
+5. A DaemonSet is not running on all expected nodes. What could be the reason?
+6. Cluster Autoscaler is not adding new nodes despite Pending Pods. How would you troubleshoot?
+7. ArgoCD shows an application as OutOfSync. How would you resolve it?
+8. An application fails because of missing AWS credentials. How would you investigate securely?
+9. CPU utilization suddenly reaches 95%. How would you identify the affected workload?
+10. Monitoring generates repeated alerts. How would you reduce false positives?
+
+## 9. SRE Interview Preparation
+
+Prepare short answers for:
+
+- What is Kubernetes observability?
+- What is the difference between monitoring and observability?
+- What is New Relic APM?
+- What is eBPF?
+- Why are DaemonSets used for monitoring?
+- What is Cluster Autoscaler?
+- How does ArgoCD implement GitOps?
+- What is the difference between `kubectl logs` and `kubectl logs --previous`?
+- How do you troubleshoot CrashLoopBackOff?
+- What is the difference between resource requests and limits?
+- How do you perform RCA for a production incident?
+
+## 10. Daily Completion Checklist
+
+- [ ] Practiced EKS cluster health checks.
+- [ ] Troubleshot Pods using describe, logs and events.
+- [ ] Practiced resource requests and limits.
+- [ ] Created and tested a DaemonSet.
+- [ ] Understood Cluster Autoscaler.
+- [ ] Practiced ArgoCD application synchronization.
+- [ ] Understood New Relic infrastructure monitoring and APM.
+- [ ] Practiced 5 real-time SRE troubleshooting scenarios.
+- [ ] Prepared monitoring and observability interview answers.
+
+**Important:** Use a non-production EKS cluster for hands-on exercises. Never paste AWS credentials or New Relic license keys into public GitHub repositories. Use Kubernetes Secrets or an appropriate external secrets manager, with proper access controls.
