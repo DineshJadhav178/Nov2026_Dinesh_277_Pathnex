@@ -1,0 +1,380 @@
+# Day 04 – Docker Coding Practice
+
+## 1. Docker Installation & Basic Commands
+
+Practice the following commands in WSL Ubuntu:
+
+```bash
+docker --version
+docker info
+docker run hello-world
+docker ps
+docker ps -a
+docker images
+docker pull nginx
+docker run -d --name my-nginx -p 8080:80 nginx
+docker logs my-nginx
+docker inspect my-nginx
+docker exec -it my-nginx /bin/bash
+docker stop my-nginx
+docker start my-nginx
+docker rm -f my-nginx
+```
+
+**Task:**
+- Run an Nginx container.
+- Access it at `http://localhost:8080`.
+- Check container logs.
+- Stop, start and remove the container.
+
+## 2. Create Your First Dockerfile
+
+Create a project directory:
+
+```bash
+mkdir docker-day04
+cd docker-day04
+```
+
+Create an HTML file:
+
+```bash
+nano index.html
+```
+
+Add the following content:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Docker Practice</title>
+</head>
+<body>
+    <h1>My First Docker Application</h1>
+    <p>Day 04 - Docker Hands-on Practice</p>
+</body>
+</html>
+```
+
+Create a Dockerfile:
+
+```bash
+nano Dockerfile
+```
+
+Add:
+
+```dockerfile
+FROM nginx:alpine
+
+WORKDIR /usr/share/nginx/html
+
+COPY index.html .
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+Build and run the image:
+
+```bash
+docker build -t my-docker-app:v1 .
+docker images
+docker run -d --name docker-app -p 8081:80 my-docker-app:v1
+```
+
+Verify:
+
+```bash
+docker ps
+docker logs docker-app
+```
+
+Open `http://localhost:8081` in your browser.
+
+**Task:**
+- Modify the HTML content.
+- Build a new image with tag `v2`.
+- Run a second container using the new image.
+- Compare both application versions.
+
+## 3. Dockerfile Instructions – Practical Examples
+
+Understand and practice these instructions:
+
+```dockerfile
+FROM ubuntu:24.04
+
+WORKDIR /app
+
+COPY . /app
+
+RUN apt-get update && apt-get install -y curl
+
+ENV APP_ENV=development
+
+EXPOSE 8080
+
+CMD ["bash"]
+```
+
+Practice:
+1. Change the base image.
+2. Create a working directory.
+3. Copy application files.
+4. Install required packages.
+5. Set environment variables.
+6. Expose an application port.
+7. Understand the difference between `RUN`, `CMD` and `ENTRYPOINT`.
+8. Build and run the image.
+
+Commands:
+
+```bash
+docker build -t ubuntu-custom:v1 .
+docker run -it ubuntu-custom:v1
+docker history ubuntu-custom:v1
+```
+
+## 4. Docker Container Management
+
+Practice container lifecycle commands:
+
+```bash
+docker run -d --name web1 nginx
+docker ps
+docker pause web1
+docker unpause web1
+docker restart web1
+docker stop web1
+docker start web1
+docker rename web1 nginx-container
+docker stats
+docker top nginx-container
+docker inspect nginx-container
+docker rm -f nginx-container
+```
+
+**Task:**
+- Create three containers with different names.
+- Stop and restart individual containers.
+- Check their resource utilization.
+- Inspect their configuration.
+- Remove all test containers.
+
+## 5. Docker Networking – Hands-on
+
+List existing networks:
+
+```bash
+docker network ls
+```
+
+Create a custom network:
+
+```bash
+docker network create my-network
+```
+
+Run two containers on the same network:
+
+```bash
+docker run -d --name web1 --network my-network nginx
+docker run -d --name web2 --network my-network nginx
+```
+
+Inspect network details:
+
+```bash
+docker network inspect my-network
+```
+
+Test communication:
+
+```bash
+docker exec web1 getent hosts web2
+```
+
+Practice:
+1. Create a bridge network.
+2. Connect multiple containers.
+3. Test communication using container names.
+4. Disconnect a container from the network.
+5. Remove the custom network.
+
+## 6. Docker Volumes – Data Persistence
+
+Create a volume:
+
+```bash
+docker volume create app-data
+docker volume ls
+docker volume inspect app-data
+```
+
+Run a container with the volume:
+
+```bash
+docker run -d --name volume-test -v app-data:/data nginx
+```
+
+Create a test file:
+
+```bash
+docker exec volume-test sh -c "echo Docker Persistent Data > /data/test.txt"
+docker exec volume-test cat /data/test.txt
+```
+
+Remove and recreate the container:
+
+```bash
+docker rm -f volume-test
+docker run -d --name volume-test -v app-data:/data nginx
+docker exec volume-test cat /data/test.txt
+```
+
+**Task:**
+- Verify that data remains available after container removal.
+- Practice bind mounts.
+- Understand read-only volume mounting.
+- Remove unused volumes safely.
+
+## 7. Docker Compose – Multi-Container Application
+
+Create a Compose project:
+
+```bash
+mkdir docker-compose-practice
+cd docker-compose-practice
+nano compose.yaml
+```
+
+Add:
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    container_name: compose-web
+    ports:
+      - "8082:80"
+    restart: unless-stopped
+
+  app:
+    image: nginx:alpine
+    container_name: compose-app
+    restart: unless-stopped
+```
+
+Execute:
+
+```bash
+docker compose up -d
+docker compose ps
+docker compose logs
+docker compose stop
+docker compose start
+docker compose down
+```
+
+**Task:**
+- Start multiple services.
+- Check service status and logs.
+- Modify the Compose file.
+- Recreate the services.
+- Understand service names and container networking.
+
+## 8. Docker Hub – Image Push & Pull
+
+Practice publishing a custom image:
+
+```bash
+docker login
+docker images
+docker tag my-docker-app:v1 YOUR_DOCKERHUB_USERNAME/my-docker-app:v1
+docker push YOUR_DOCKERHUB_USERNAME/my-docker-app:v1
+docker pull YOUR_DOCKERHUB_USERNAME/my-docker-app:v1
+```
+
+**Task:**
+- Create a Docker Hub repository.
+- Push your custom image.
+- Pull it again.
+- Run a container using the pulled image.
+- Practice version tagging using `v1` and `v2`.
+
+Replace `YOUR_DOCKERHUB_USERNAME` with your actual Docker Hub username.
+
+## 9. Docker Troubleshooting Commands
+
+Practice these commands:
+
+```bash
+docker ps -a
+docker logs CONTAINER_NAME
+docker inspect CONTAINER_NAME
+docker stats
+docker top CONTAINER_NAME
+docker events
+docker system df
+docker system prune
+docker image prune
+docker network inspect NETWORK_NAME
+docker volume inspect VOLUME_NAME
+```
+
+Troubleshooting exercises:
+
+1. Identify why a container exited.
+2. Investigate a container restarting continuously.
+3. Troubleshoot an application not accessible through the mapped port.
+4. Identify high CPU or memory utilization.
+5. Check why two containers cannot communicate.
+6. Verify whether application data persists after restart.
+7. Identify why a Docker image build failed.
+8. Investigate exit code 137.
+
+## 10. Docker Security & Optimization
+
+Practice the following:
+
+1. Create a `.dockerignore` file.
+2. Exclude unnecessary files from Docker builds.
+3. Run a container using a non-root user.
+4. Set CPU and memory limits.
+5. Configure container restart policies.
+6. Create a Docker health check.
+7. Use lightweight base images such as Alpine where appropriate.
+8. Explore multi-stage Docker builds.
+9. Inspect image layers using `docker history`.
+10. Understand why credentials should not be hardcoded in Dockerfiles.
+
+## 11. Docker with CI/CD – Basic Practice
+
+1. Create a GitHub repository for your Docker application.
+2. Push your Dockerfile and application code.
+3. Create a GitHub Actions workflow.
+4. Configure the workflow to trigger on every push.
+5. Build a Docker image through the pipeline.
+6. Tag the image with a version.
+7. Understand how to authenticate with Docker Hub using GitHub Secrets.
+8. Push the image to Docker Hub.
+9. Check workflow execution logs.
+10. Understand how the image can be deployed to a server or Kubernetes environment.
+
+## Daily Completion Checklist
+
+- [ ] Execute at least 15 Docker commands.
+- [ ] Create and run a custom Dockerfile.
+- [ ] Build two Docker image versions.
+- [ ] Practice container lifecycle management.
+- [ ] Create and test a Docker network.
+- [ ] Practice persistent storage using volumes.
+- [ ] Run a multi-container application using Docker Compose.
+- [ ] Push a custom image to Docker Hub.
+- [ ] Complete at least 3 troubleshooting exercises.
+- [ ] Save commands, outputs and learnings in GitHub.
+
+**Important:** Execute each command yourself in WSL Ubuntu. Capture the command, expected output, actual output and troubleshooting steps. Never store Docker Hub passwords or access tokens in your GitHub repository.

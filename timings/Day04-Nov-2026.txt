@@ -1,0 +1,207 @@
+# Day 04 – Docker Concepts & Coding Practice
+
+## 1. Docker Fundamentals – Core Concepts
+
+Understand the following concepts with practical examples:
+
+1. What is Docker, and why is it used?
+2. Understand Docker architecture: Docker Client, Docker Daemon, Docker Engine and Docker Registry.
+3. Understand the difference between Virtual Machines and Containers.
+4. What are Docker Images and Docker Containers?
+5. Understand Docker Hub and private container registries.
+6. What is a Dockerfile, and why is it required?
+7. Understand container lifecycle: Created, Running, Paused, Stopped and Removed.
+8. Understand the difference between `CMD` and `ENTRYPOINT`.
+9. Understand Docker layers and image caching.
+10. Learn the difference between containerization and virtualization.
+
+## 2. Docker Installation & Basic Command Practice
+
+Practice Docker installation and verify the environment.
+
+1. Install Docker Desktop or Docker Engine in your Linux environment.
+2. Verify Docker installation using `docker --version`.
+3. Check Docker service status.
+4. Run your first container using `docker run hello-world`.
+5. List running containers using `docker ps`.
+6. List all containers using `docker ps -a`.
+7. Download an image using `docker pull nginx`.
+8. List downloaded images using `docker images`.
+9. Start and stop containers using `docker start` and `docker stop`.
+10. Remove containers using `docker rm`.
+11. Remove images using `docker rmi`.
+12. Inspect container configuration using `docker inspect`.
+13. View container logs using `docker logs`.
+14. Execute commands inside a running container using `docker exec -it`.
+
+## 3. Dockerfile – Build Your First Image
+
+Create a basic Dockerfile and build a custom Docker image.
+
+1. Understand Dockerfile instructions:
+   - `FROM`
+   - `WORKDIR`
+   - `COPY`
+   - `ADD`
+   - `RUN`
+   - `ENV`
+   - `EXPOSE`
+   - `CMD`
+   - `ENTRYPOINT`
+   - `USER`
+
+2. Create a simple Dockerfile using an Nginx base image.
+3. Add a custom HTML page to the container.
+4. Build an image using `docker build`.
+5. Tag an image using `docker tag`.
+6. Run a container from your custom image.
+7. Access the application through a browser.
+8. Modify the HTML page and rebuild the image.
+9. Understand Docker image layers and build caching.
+10. Practice using `.dockerignore` to exclude unnecessary files.
+
+## 4. Docker Container Management & Networking
+
+Practice container operations and understand communication between containers.
+
+1. Run containers in detached mode using `-d`.
+2. Assign container names using `--name`.
+3. Map host and container ports using `-p`.
+4. Set environment variables using `-e`.
+5. Allocate memory and CPU limits to containers.
+6. Understand bridge, host and none network drivers.
+7. List Docker networks using `docker network ls`.
+8. Create a custom network using `docker network create`.
+9. Connect containers to a custom network.
+10. Understand container-to-container communication.
+11. Inspect network configuration using `docker network inspect`.
+12. Understand port mapping and container IP addresses.
+
+## 5. Docker Volumes & Persistent Storage
+
+Understand how Docker manages application data.
+
+1. What are Docker volumes?
+2. Understand the difference between volumes and bind mounts.
+3. Create a volume using `docker volume create`.
+4. List volumes using `docker volume ls`.
+5. Inspect volumes using `docker volume inspect`.
+6. Mount a volume inside a container using `-v`.
+7. Practice bind mounting a local directory.
+8. Verify data persistence after container restart.
+9. Understand read-only volume mounts.
+10. Remove unused volumes safely.
+
+## 6. Docker Compose – Multi-Container Applications
+
+Create and manage multiple containers using Docker Compose.
+
+1. Understand what Docker Compose is and why it is used.
+2. Understand the structure of a `docker-compose.yml` file.
+3. Learn important Compose properties:
+   - `services`
+   - `image`
+   - `build`
+   - `ports`
+   - `volumes`
+   - `environment`
+   - `networks`
+   - `depends_on`
+   - `restart`
+
+4. Create a basic Docker Compose application using Nginx.
+5. Run services using `docker compose up -d`.
+6. List services using `docker compose ps`.
+7. View logs using `docker compose logs`.
+8. Stop services using `docker compose stop`.
+9. Remove containers and networks using `docker compose down`.
+10. Build and rebuild images using Docker Compose.
+11. Practice deploying a simple application with a database container.
+12. Understand service discovery and communication between Compose services.
+
+## 7. Docker Registry & Image Management
+
+Practice managing and publishing Docker images.
+
+1. Understand Docker Hub and container registries.
+2. Create a Docker Hub account.
+3. Authenticate using `docker login`.
+4. Tag a local image with your Docker Hub username.
+5. Push an image using `docker push`.
+6. Pull an image using `docker pull`.
+7. Understand image tags such as `latest` and version-based tags.
+8. Understand image versioning and rollback.
+9. Learn the basics of private container registries.
+10. Understand why credentials and secrets should not be hardcoded in Docker images.
+
+## 8. Docker Troubleshooting & Security
+
+Practice common production-level Docker troubleshooting.
+
+1. Container exits immediately after starting. Investigate using `docker ps -a` and `docker logs`.
+2. Application is running inside the container but inaccessible externally. Troubleshoot port mapping.
+3. Container is consuming excessive CPU or memory. Investigate using `docker stats`.
+4. Container cannot communicate with another container. Troubleshoot Docker networking.
+5. Application data disappears after container removal. Investigate volume configuration.
+6. Docker image build fails. Analyze Dockerfile instructions and build logs.
+7. Container enters a restart loop. Investigate exit codes, logs and restart policies.
+8. Understand container health checks using `HEALTHCHECK`.
+9. Run containers as non-root users where possible.
+10. Understand image vulnerability scanning and secure base images.
+11. Learn the basics of Docker resource limits.
+12. Understand why secrets should not be stored in Dockerfiles or image layers.
+
+## 9. Real-Time DevOps & SRE Scenarios
+
+1. A Docker container is continuously restarting in production. How would you troubleshoot it?
+2. A container is running, but the application is not accessible. What checks would you perform?
+3. A Docker image build is taking too much time. How would you optimize it?
+4. An application container is consuming high memory and CPU. How would you investigate?
+5. A container loses application data after being recreated. How would you prevent this?
+6. Two containers are unable to communicate with each other. How would you troubleshoot networking?
+7. A new Docker image deployment causes application failure. How would you roll back?
+8. A container exits with status code 137. What could be the reason, and how would you investigate?
+9. A Docker image contains sensitive credentials. What actions would you take?
+10. How would you monitor Docker containers in a production environment?
+11. How would you reduce Docker image size and improve deployment efficiency?
+12. How would you deploy and manage multiple application containers using Docker Compose?
+
+## 10. Docker with CI/CD – Basic Integration
+
+Understand how Docker fits into a DevOps CI/CD pipeline.
+
+1. Understand the role of Docker in CI/CD.
+2. Understand the Docker image build stage in Jenkins or GitHub Actions.
+3. Create a basic pipeline to build a Docker image.
+4. Tag the image using a build number or version.
+5. Push the image to Docker Hub.
+6. Understand how deployment pipelines pull and run new images.
+7. Understand image promotion between development, testing and production.
+8. Learn the basics of container image rollback.
+9. Understand how Docker works with Kubernetes and Amazon EKS.
+10. Explore how CI/CD pipelines can automate container deployment.
+
+## Daily Completion Target
+
+- Understand at least 10 Docker fundamentals.
+- Practice 15–20 Docker commands.
+- Create and run 2 custom Docker images.
+- Write and execute 1 Dockerfile.
+- Practice container networking and volume mounting.
+- Build 1 multi-container application using Docker Compose.
+- Push 1 custom image to Docker Hub.
+- Troubleshoot at least 3 Docker scenarios.
+- Understand 2 Docker-related production incidents.
+- Save all commands, outputs, errors and solutions in your GitHub practice repository.
+
+## Next-Day Learning Plan
+
+- Advanced Dockerfile optimization and multi-stage builds.
+- Docker image security and vulnerability scanning.
+- Docker health checks and restart policies.
+- Docker troubleshooting in production.
+- Docker integration with Jenkins and GitHub Actions.
+- Docker with Kubernetes and Amazon EKS.
+- Basic Python or Shell automation for container monitoring.
+
+**Important:** Focus on practical execution rather than memorizing commands. For every concept, understand what it does, execute it in WSL/Linux, observe the output, and relate it to a real SRE/DevOps production scenario.
