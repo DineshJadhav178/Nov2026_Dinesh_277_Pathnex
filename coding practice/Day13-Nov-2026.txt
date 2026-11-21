@@ -1,0 +1,77 @@
+# Day 12 – DevSecOps & AIOps Coding Practice
+
+## 1. Python Scripting for DevOps
+
+1. Write a Python script to read application log files and identify ERROR and WARNING messages.
+2. Create a script to count the total number of errors in a log file.
+3. Write a script to identify repeated failed login attempts.
+4. Create a Python script to monitor CPU and memory utilization.
+5. Write a script to check whether a particular service or process is running.
+6. Automate the cleanup of old log files based on file age.
+7. Create a script to generate a daily system health report.
+
+## 2. Docker Security – Hands-on Practice
+
+1. Create a Dockerfile using a minimal base image.
+2. Build a Docker image using `docker build`.
+3. Scan the Docker image for vulnerabilities using Trivy.
+4. Identify and fix HIGH and CRITICAL vulnerabilities.
+5. Run a container as a non-root user.
+6. Avoid hardcoding passwords and API keys in Dockerfiles.
+7. Practice Docker image tagging and pushing to Docker Hub.
+8. Understand image layers and reduce unnecessary image size.
+
+## 3. Jenkins & CI/CD Security
+
+1. Create a basic Jenkins pipeline using a Jenkinsfile.
+2. Configure source-code checkout from GitHub.
+3. Integrate SonarQube for static code analysis.
+4. Add a security scanning stage using Trivy.
+5. Configure pipeline failure when critical vulnerabilities are detected.
+6. Store credentials securely using Jenkins Credentials.
+7. Understand how to avoid hardcoded secrets in pipeline scripts.
+8. Practice pipeline execution and troubleshooting.
+
+## 4. DevSecOps Security Tools
+
+Practice the following tools with practical examples:
+
+1. **SonarQube** – Static application security and code quality analysis.
+2. **Trivy** – Container image, filesystem and configuration vulnerability scanning.
+3. **Snyk** – Dependency and container security scanning.
+4. **Git Secret Scanning** – Identify accidentally committed credentials.
+5. **SBOM** – Generate a Software Bill of Materials using a supported scanning tool.
+6. **Terraform Security** – Scan Terraform configurations for security misconfigurations.
+
+## 5. AIOps & AI-Based Automation
+
+1. Write a Python script to summarize application errors from log files.
+2. Understand RAG-based log analysis.
+3. Explore how AI can identify recurring production incidents.
+4. Design a workflow where an alert triggers automated log analysis.
+5. Understand multi-agent workflows for incident investigation.
+6. Explore how AI can suggest possible root causes from monitoring data.
+7. Understand human approval before executing production remediation.
+
+## 6. Real-Time DevSecOps Scenarios
+
+1. A developer accidentally commits AWS credentials to GitHub. How would you respond?
+2. A Docker image contains critical vulnerabilities. How would you fix them?
+3. A Jenkins pipeline fails because SonarQube reports security issues. How would you troubleshoot?
+4. A critical production bug is blocked by a security scanning policy. What would you do?
+5. How would you generate an SBOM for an application?
+6. How would you prevent secrets from being exposed in CI/CD pipelines?
+7. How would you use AI to analyze application logs during a P1 incident?
+8. How would you implement Shift-Left Security in a DevOps pipeline?
+
+## Daily Completion Target
+
+- Complete 5 Python scripting exercises.
+- Build and scan 1 Docker image using Trivy.
+- Create 1 Jenkins CI/CD pipeline with security scanning.
+- Practice 3 security tools.
+- Understand SBOM generation and RAG-based log analysis.
+- Solve 5 real-time DevSecOps interview scenarios.
+- Push all coding practice files to GitHub.
+
+**Important:** Execute the exercises practically in WSL or a local lab environment. Use test credentials and sample applications only. Never expose real AWS credentials, API keys or production secrets. Record commands, outputs, errors and solutions for future revision and interviews.
