@@ -1,4 +1,4 @@
-# Day 09 – Amazon EKS Cluster Upgrade Coding Practice
+ # Day 09 – Amazon EKS Cluster Upgrade Coding Practice
 
 ## 1. Check Existing EKS Cluster Details
 
