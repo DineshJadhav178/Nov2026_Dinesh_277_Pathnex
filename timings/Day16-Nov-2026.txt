@@ -1,0 +1,30 @@
+# Day 12 – AWS Advanced Services | KMS, Databases, ETL & CI/CD
+
+## What I did today:
+
+1. 1 hour – AWS Encryption and KMS: Symmetric and asymmetric encryption, HTTPS handshake fundamentals, AWS Key Management Service (KMS), key policies, key administrators and key users.
+2. 1 hour – AWS Database Services: SQL vs. NoSQL databases, Amazon Aurora, DynamoDB, Redshift, database connectivity, endpoints and database security.
+3. 1 hour – AWS Batch and ETL: Batch processing, compute environments, job queues, job definitions, AWS Glue, ETL workflows and Lambda runtime limitations.
+4. 1 hour – Application Deployment and Content Delivery: Elastic Beanstalk, Platform-as-a-Service (PaaS), Amazon CloudFront, CDN, edge locations, caching and origin servers.
+5. 1 hour – AWS Migration and Hybrid Connectivity: AWS Snowball, Data Transfer Terminal, AWS DataSync, AWS Direct Connect and on-premises to AWS connectivity.
+6. 1 hour – AWS DevOps and Observability: CodePipeline, CodeBuild, CodeDeploy, rolling deployments, blue-green deployments, canary deployments and AWS X-Ray distributed tracing.
+
+## Tomorrow's Tasks:
+
+1. Practice creating and exploring AWS KMS keys and key policies.
+2. Understand symmetric and asymmetric encryption with practical examples.
+3. Explore Amazon RDS and Aurora database configurations.
+4. Understand DynamoDB tables, partition keys, sort keys and capacity modes.
+5. Practice basic database connectivity and troubleshooting.
+6. Understand Amazon Redshift and data warehouse concepts.
+7. Explore AWS Batch compute environments, job queues and job definitions.
+8. Understand ETL workflows and AWS Glue fundamentals.
+9. Explore Elastic Beanstalk application deployment.
+10. Understand CloudFront distributions, origins, caching and edge locations.
+11. Compare Snowball, DataSync and Direct Connect.
+12. Understand AWS CodePipeline, CodeBuild and CodeDeploy.
+13. Explore rolling, blue-green and canary deployment strategies.
+14. Understand AWS X-Ray traces, latency and service maps.
+15. Practice 15 AWS DevOps/SRE interview questions.
+
+**Important:** Perform practical exercises in a test AWS account. Check service pricing, database charges, data transfer costs and resource cleanup before completing the session.
