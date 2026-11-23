@@ -1,0 +1,27 @@
+# Day 11 – AWS Advanced Services | Auto Scaling, Lambda & Security
+
+## What I did today:
+
+1. 1 hour – AWS Auto Scaling fundamentals: Scale out, scale in, horizontal scaling, vertical scaling, Auto Scaling Groups (ASG), launch templates and instance health checks.
+2. 1 hour – Amazon CloudWatch integration: CPU utilization metrics, CloudWatch alarms, scaling policies, target tracking and automatic scaling actions.
+3. 1 hour – AWS Lambda: Serverless computing, event-driven architecture, Lambda functions, triggers, destinations, execution models and common use cases.
+4. 1 hour – IAM roles and policies: Lambda execution roles, permissions, trust relationships, CloudWatch Logs integration and least-privilege access.
+5. 1 hour – AWS Shield and AWS WAF: DDoS protection, Web ACLs, IP filtering, geo-based filtering, rate-based rules, SQL injection and XSS protection.
+6. 1 hour – Amazon GuardDuty and Amazon Inspector: Threat detection, security findings, vulnerability scanning, CVEs, severity ratings and automated security monitoring.
+
+## Tomorrow's Tasks:
+
+1. Practice creating an EC2 Auto Scaling Group using a Launch Template.
+2. Configure CloudWatch alarms and understand scaling policies.
+3. Practice scale-out and scale-in operations.
+4. Create a basic AWS Lambda function and execute it.
+5. Configure an S3 event notification to trigger a Lambda function.
+6. Understand Lambda execution roles and CloudWatch Logs permissions.
+7. Explore AWS WAF Web ACLs and practice IP-based and rate-based rules.
+8. Understand AWS Shield Standard and Shield Advanced.
+9. Explore GuardDuty findings and understand threat detection.
+10. Explore Amazon Inspector findings and CVE vulnerability reports.
+11. Practice 10 AWS security and serverless interview questions.
+12. Understand how to integrate EventBridge with automated security response workflows.
+
+**Important:** Perform all exercises in a test AWS account and review resource configurations and billing before leaving the environment.
