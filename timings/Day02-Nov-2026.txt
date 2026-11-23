@@ -1,0 +1,364 @@
+# Day 10 – AWS Hands-on Practice | VPC, S3, IAM, Route 53 & CloudTrail
+
+## 1. AWS VPC and Networking
+
+### Understand VPC Fundamentals
+
+Practice the following concepts:
+
+1. Create a custom VPC.
+2. Understand CIDR blocks and IP address allocation.
+3. Create public and private subnets.
+4. Understand Availability Zones.
+5. Configure route tables.
+6. Understand Internet Gateway (IGW).
+7. Understand the difference between public and private subnets.
+
+### Practical Tasks
+
+1. Create a VPC with CIDR block `10.0.0.0/16`.
+2. Create a public subnet with CIDR `10.0.1.0/24`.
+3. Create a private subnet with CIDR `10.0.2.0/24`.
+4. Attach an Internet Gateway to the VPC.
+5. Create a public route table.
+6. Add a default route `0.0.0.0/0` pointing to the Internet Gateway.
+7. Associate the public subnet with the public route table.
+8. Understand why a private subnet cannot directly access the internet without an appropriate network path.
+
+## 2. Security Groups vs Network ACLs
+
+### Security Groups
+
+Practice configuring:
+
+- Inbound traffic rules.
+- Outbound traffic rules.
+- SSH access on port 22.
+- HTTP access on port 80.
+- HTTPS access on port 443.
+
+### Network ACLs
+
+Practice configuring:
+
+- Allow and deny rules.
+- Inbound and outbound rules.
+- Rule priorities and numbering.
+- Ephemeral ports for return traffic.
+
+### Important Differences
+
+| Security Groups | Network ACLs |
+|---|---|
+| Operate at instance/ENI level | Operate at subnet level |
+| Stateful | Stateless |
+| Support allow rules only | Support allow and deny rules |
+| Return traffic is automatically allowed | Return traffic must be explicitly permitted |
+
+**Practice scenarios:**
+
+1. EC2 instance is not accessible through SSH. How would you troubleshoot it?
+2. HTTP traffic is blocked. Which Security Group rules would you check?
+3. What happens if a Security Group allows traffic but the NACL blocks it?
+4. Why are ephemeral ports important in NACL configuration?
+
+## 3. Amazon S3 – Storage and Management
+
+### Practical Exercises
+
+1. Open the Amazon S3 console.
+2. Create a bucket with a globally unique name.
+3. Upload an HTML file or text file.
+4. Download the uploaded object.
+5. Delete an object.
+6. Enable bucket versioning.
+7. Upload the same file with modified content.
+8. Explore previous object versions.
+9. Enable default bucket encryption.
+10. Explore S3 storage classes.
+
+### Important S3 Configurations
+
+**Bucket versioning:**
+
+- Enable versioning.
+- Upload multiple versions of the same object.
+- Identify previous versions.
+- Restore an older version.
+- Understand delete markers.
+
+**Encryption:**
+
+- SSE-S3: Encryption using S3-managed keys.
+- SSE-KMS: Encryption using AWS KMS keys.
+
+**Bucket security:**
+
+- Enable Block Public Access.
+- Understand bucket policies.
+- Understand IAM policies.
+- Explore least-privilege access.
+
+### S3 and CloudFront Integration
+
+Understand the following architecture:
+
+1. Create an S3 bucket for static website content.
+2. Understand static website hosting.
+3. Explore CloudFront distribution configuration.
+4. Understand Origin Access Control (OAC).
+5. Understand how CloudFront accesses a private S3 bucket.
+
+## 4. AWS Systems Manager – Session Manager
+
+### Key Concepts
+
+Understand:
+
+- AWS Systems Manager.
+- Session Manager.
+- SSM Agent.
+- IAM instance profiles.
+- Systems Manager permissions.
+- Private EC2 instance connectivity.
+
+### Practical Tasks
+
+1. Launch an EC2 instance in a test environment.
+2. Attach an appropriate IAM role with Systems Manager permissions.
+3. Verify that SSM Agent is running.
+4. Ensure the instance can reach the required Systems Manager endpoints.
+5. Open Systems Manager in the AWS console.
+6. Navigate to Session Manager.
+7. Start a session with the EC2 instance.
+8. Execute Linux commands through the session.
+9. Explore session logging and auditing options.
+
+### Practice Commands
+
+```bash
+# Check current user
+whoami
+
+# Check hostname
+hostname
+
+# Check operating system
+cat /etc/os-release
+
+# Check system uptime
+uptime
+
+# Check running processes
+ps -ef
+
+# Check disk usage
+df -h
+
+# Check memory usage
+free -h
+```
+
+**Practice scenarios:**
+
+1. EC2 instance is not appearing in Systems Manager. What would you check?
+2. Session Manager connection is failing. How would you troubleshoot it?
+3. Why is an IAM instance profile required?
+4. What is the difference between SSH access and Session Manager?
+
+## 5. Amazon Route 53 – DNS Management
+
+### Understand DNS Fundamentals
+
+Learn the following record types:
+
+- A Record – Maps a domain to an IPv4 address.
+- AAAA Record – Maps a domain to an IPv6 address.
+- CNAME Record – Maps one DNS name to another DNS name.
+- NS Record – Identifies authoritative name servers.
+- Alias Record – AWS-specific functionality that points supported records to AWS resources such as ALBs.
+
+### Practical Tasks
+
+1. Open Amazon Route 53.
+2. Understand hosted zones.
+3. Explore public hosted zones.
+4. Understand private hosted zones.
+5. Explore DNS record creation.
+6. Understand A and CNAME records.
+7. Explore Alias records pointing to an Application Load Balancer.
+8. Understand DNS routing policies.
+
+### DNS Troubleshooting Commands
+
+```bash
+# Check DNS resolution
+nslookup google.com
+
+# Query DNS records
+dig google.com
+
+# Check DNS using a specific record type
+dig google.com A
+
+# Check DNS response
+dig google.com +short
+
+# Check network connectivity
+ping -c 4 google.com
+
+# Check HTTP response
+curl -I https://google.com
+```
+
+**Practice scenarios:**
+
+1. Domain is not resolving. How would you troubleshoot it?
+2. What is the difference between a public and private hosted zone?
+3. What is the difference between an A record and a CNAME record?
+4. How does Route 53 route traffic to an Application Load Balancer?
+
+## 6. AWS CloudTrail – Auditing and Governance
+
+### Key Concepts
+
+Understand:
+
+- AWS CloudTrail.
+- Event History.
+- Management Events.
+- Data Events.
+- AWS API activity tracking.
+- User identity and access key information.
+- Audit logging.
+
+### Practical Tasks
+
+1. Open the AWS CloudTrail console.
+2. Navigate to Event History.
+3. Explore recent AWS account activities.
+4. Search for events by event name.
+5. Filter events by username.
+6. Investigate EC2-related API activities.
+7. Identify the user or IAM role responsible for an action.
+8. Explore event details, timestamps and source IP addresses.
+9. Understand CloudTrail trails and S3 log delivery.
+10. Explore CloudTrail integration with CloudWatch Logs.
+
+### Important AWS Events to Explore
+
+```text
+RunInstances
+TerminateInstances
+StopInstances
+StartInstances
+CreateBucket
+PutObject
+DeleteBucket
+AuthorizeSecurityGroupIngress
+CreateUser
+AttachRolePolicy
+```
+
+**Practice scenarios:**
+
+1. An EC2 instance was terminated unexpectedly. How would you identify who terminated it?
+2. A Security Group rule was modified. How would you investigate the change?
+3. How can you identify which IAM user or role performed an AWS API operation?
+4. What is the difference between CloudTrail and CloudWatch?
+
+## 7. AWS CLI – Basic Practice
+
+Configure AWS CLI in a secure local environment using an appropriate authentication method.
+
+```bash
+# Check AWS CLI version
+aws --version
+
+# Check configured identity
+aws sts get-caller-identity
+
+# List S3 buckets
+aws s3 ls
+
+# List EC2 instances
+aws ec2 describe-instances
+
+# List VPCs
+aws ec2 describe-vpcs
+
+# List subnets
+aws ec2 describe-subnets
+
+# List Security Groups
+aws ec2 describe-security-groups
+
+# List Route 53 hosted zones
+aws route53 list-hosted-zones
+
+# Check CloudTrail trails
+aws cloudtrail describe-trails
+```
+
+## 8. AWS Real-Time Troubleshooting Scenarios
+
+Practice the following scenarios:
+
+1. EC2 instance in a public subnet is not accessible through SSH.
+2. EC2 instance cannot access the internet even though it has a public IP.
+3. An application is not accessible because of incorrect Security Group rules.
+4. Network traffic is blocked by a NACL.
+5. An S3 bucket is returning Access Denied errors.
+6. An S3 object was accidentally overwritten. How would you restore the previous version?
+7. An EC2 instance is not showing as a managed node in Systems Manager.
+8. Session Manager is unable to establish a connection with a private EC2 instance.
+9. A domain is not resolving to the correct Application Load Balancer.
+10. An EC2 instance was terminated unexpectedly. How would you investigate it using CloudTrail?
+
+## 9. AWS Interview Preparation
+
+Prepare answers for the following questions:
+
+1. What is an AWS VPC?
+2. What is the difference between a public subnet and a private subnet?
+3. Why does AWS reserve five IP addresses in every IPv4 subnet?
+4. What is the difference between Security Groups and NACLs?
+5. What is an Internet Gateway?
+6. What is the difference between S3 and EBS?
+7. What is S3 versioning?
+8. What is the difference between SSE-S3 and SSE-KMS?
+9. How does CloudFront work with a private S3 bucket?
+10. What is AWS Systems Manager Session Manager?
+11. How can you access a private EC2 instance without SSH?
+12. What is the difference between an A record and a CNAME record?
+13. What is the difference between public and private hosted zones?
+14. What is AWS CloudTrail?
+15. How would you identify who terminated an EC2 instance?
+
+## 10. Daily Completion Checklist
+
+- [ ] Understood VPC, CIDR blocks and subnet concepts.
+- [ ] Practiced public and private subnet configurations.
+- [ ] Understood route tables and Internet Gateway.
+- [ ] Configured Security Groups and explored NACLs.
+- [ ] Created an S3 bucket and uploaded objects.
+- [ ] Practiced S3 versioning and encryption.
+- [ ] Understood CloudFront and private S3 integration.
+- [ ] Explored Systems Manager Session Manager.
+- [ ] Practiced EC2 access without SSH keys.
+- [ ] Understood Route 53 records and hosted zones.
+- [ ] Explored CloudTrail Event History.
+- [ ] Practiced AWS CLI commands.
+- [ ] Practiced 10 AWS troubleshooting scenarios.
+- [ ] Prepared answers for 15 AWS interview questions.
+
+**Important Notes:**
+
+1. Perform all practical exercises in a personal AWS test account.
+2. Check AWS pricing before creating resources. Free Tier eligibility does not guarantee that every configuration is free.
+3. Delete unused resources after completing practice to avoid unexpected charges.
+4. Never expose AWS access keys, secret keys or passwords.
+5. Follow the principle of least privilege when creating IAM roles and policies.
+6. Keep S3 Block Public Access enabled unless public access is explicitly required.
+7. Use CloudFront Origin Access Control when serving private S3 content through CloudFront.
+8. Never modify production VPC, Security Group, S3 or IAM configurations for practice.
