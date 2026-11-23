@@ -1,0 +1,20 @@
+# Day 09 – End-to-End CI/CD Pipeline Monitoring & Troubleshooting
+
+## What I learned today:
+
+1. 1 hour – Understanding the complete CI/CD pipeline flow, from Git commit and source code integration to automated builds, testing and production deployment.
+2. 1 hour – Jenkins pipeline troubleshooting: Analyzing console logs, debugging failed stages, resolving environment variable issues, credentials and GitHub webhook triggers.
+3. 1 hour – Docker build and registry troubleshooting: Understanding Docker image creation, tagging, authentication issues, image push failures and Docker Hub integration.
+4. 1 hour – Kubernetes deployment troubleshooting: Investigating ImagePullBackOff, failed rollouts, pod health checks, application logs and deployment recovery.
+5. 30 minutes – CI/CD monitoring and failure analysis using Jenkins, Maven, SonarQube, Nexus, Git, Docker and Kubernetes.
+6. 30 minutes – Understanding production deployment failures, rollback strategies, root cause analysis (RCA) and incident management.
+
+## Tomorrow's tasks:
+
+1. Practice creating an end-to-end Jenkins CI/CD pipeline using GitHub integration.
+2. Practice Docker image building, tagging, pushing and pulling from Docker Hub.
+3. Deploy a containerized application on Kubernetes using Deployment and Service YAML files.
+4. Practice troubleshooting Jenkins build failures and Kubernetes ImagePullBackOff scenarios.
+5. 1 hour – Python scripting and automation practice.
+6. 1 hour – SRE/DevOps interview questions based on real-time CI/CD troubleshooting.
+7. English speaking practice: Explain an end-to-end CI/CD pipeline and production deployment failure scenarios.
