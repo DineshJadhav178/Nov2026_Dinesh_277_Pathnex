@@ -1,0 +1,52 @@
+# Day 18 – Kubernetes Operations and ArgoCD (GitOps)
+
+## What I did today:
+
+1. **Kubernetes Node Management and Operations (1 Hour)**
+   - Revised Kubernetes cluster architecture, including control plane, worker nodes, and workloads.
+   - Learned node maintenance operations using `kubectl cordon` and `kubectl drain`.
+   - Understood how cordon prevents new pod scheduling and drain safely evicts eligible workloads.
+   - Studied node readiness, pod scheduling, and cluster capacity considerations.
+
+2. **Kubernetes Cluster Scaling and Troubleshooting (1 Hour)**
+   - Learned the basics of scaling Kubernetes workloads and cluster nodes.
+   - Practiced understanding pod distribution and node resource utilization.
+   - Reviewed common troubleshooting scenarios involving Pending pods, node failures, and insufficient CPU or memory.
+   - Understood how to investigate pod status, events, and node conditions using kubectl commands.
+
+3. **GitOps and ArgoCD Fundamentals (1 Hour)**
+   - Studied GitOps principles and the declarative approach to managing Kubernetes deployments.
+   - Understood ArgoCD architecture and its role in continuous delivery.
+   - Learned how ArgoCD monitors Git repositories and compares the desired state with the actual cluster state.
+   - Explored the concepts of Application, Sync Status, Health Status, and automated reconciliation.
+
+4. **ArgoCD Installation and Configuration (1 Hour)**
+   - Learned how to install ArgoCD in Kubernetes using Helm.
+   - Reviewed ArgoCD components and the purpose of its web interface.
+   - Understood how to connect a Git repository with an ArgoCD Application.
+   - Explored application configuration, repository access, and Kubernetes deployment manifests.
+
+5. **GitOps Deployment, Sync Policies, and Rollbacks (1 Hour)**
+   - Studied manual and automated synchronization policies in ArgoCD.
+   - Understood how Git changes trigger deployment synchronization.
+   - Learned the importance of pull requests, code reviews, and approval workflows before merging changes.
+   - Explored rollback concepts and how Git history can be used to restore a previously working deployment.
+   - Understood how GitOps can help manage deployments across multiple Kubernetes clusters.
+
+6. **Secrets Management, Security, and Real-world Troubleshooting (1 Hour)**
+   - Reviewed Kubernetes Secrets and secure configuration management practices.
+   - Studied connectivity troubleshooting involving worker nodes, network access, and security groups.
+   - Understood why manual Kubernetes operations should be learned before automating them.
+   - Explored how AI tools can assist with configuration troubleshooting and command understanding.
+   - Revised Kubernetes operations and ArgoCD concepts from an SRE perspective.
+
+## Tomorrow's Tasks:
+
+1. Practice Kubernetes node maintenance using cordon and drain.
+2. Deploy a sample application using Kubernetes manifests.
+3. Install ArgoCD in a lab Kubernetes cluster using Helm.
+4. Connect a Git repository with an ArgoCD Application.
+5. Practice manual sync, automated sync, and self-healing concepts.
+6. Perform a deployment update and rollback using Git.
+7. Understand Kubernetes Secrets and secure GitOps practices.
+8. Prepare Kubernetes and ArgoCD troubleshooting scenarios for SRE interviews.

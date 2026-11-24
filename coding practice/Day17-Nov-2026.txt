@@ -1,0 +1,578 @@
+# Day 17 – ELK Stack | Hands-on Practice
+
+## 1. Centralized Logging – Basic Architecture
+
+### Objective:
+Understand how logs move from application servers to a centralized logging platform.
+
+### Architecture:
+
+```text
+Application / Linux Server / Kubernetes Pod
+                  |
+                  v
+              Filebeat
+          (Log Collection)
+                  |
+                  v
+              Logstash
+       (Parsing and Processing)
+                  |
+                  v
+           Elasticsearch
+        (Indexing and Storage)
+                  |
+                  v
+               Kibana
+       (Search and Visualization)
+```
+
+### Key Concepts:
+
+- **Filebeat:** Collects and forwards log files.
+- **Logstash:** Processes, parses, and transforms incoming log events.
+- **Elasticsearch:** Stores and indexes log events for searching.
+- **Kibana:** Provides a user interface for searching logs and building dashboards.
+
+### Practice Questions:
+
+1. Why do we need centralized logging?
+2. What problems occur when logs are stored separately on multiple servers?
+3. What is the difference between monitoring and logging?
+4. Explain the end-to-end ELK architecture.
+5. What is the role of Filebeat?
+
+---
+
+## 2. Elasticsearch – Installation and Basic Operations
+
+### Objective:
+Understand Elasticsearch and practice basic cluster health and index operations.
+
+### Important APIs:
+
+Check Elasticsearch health:
+
+```bash
+curl -X GET "http://localhost:9200/_cluster/health?pretty"
+```
+
+Check Elasticsearch node information:
+
+```bash
+curl -X GET "http://localhost:9200/_nodes?pretty"
+```
+
+List indices:
+
+```bash
+curl -X GET "http://localhost:9200/_cat/indices?v"
+```
+
+Create a practice index:
+
+```bash
+curl -X PUT "http://localhost:9200/sre-logs"
+```
+
+Insert a sample log:
+
+```bash
+curl -X POST "http://localhost:9200/sre-logs/_doc" \
+-H "Content-Type: application/json" \
+-d '{
+  "timestamp": "2026-11-24T10:30:00",
+  "level": "ERROR",
+  "service": "payment-service",
+  "message": "Database connection timeout"
+}'
+```
+
+Search logs:
+
+```bash
+curl -X GET "http://localhost:9200/sre-logs/_search?pretty"
+```
+
+### Important Concepts:
+
+- Index: Logical collection of documents.
+- Document: Individual JSON record.
+- Shard: Partition of an index.
+- Replica: Copy of a primary shard.
+- Cluster: Collection of Elasticsearch nodes.
+- Mapping: Defines how fields are stored and indexed.
+
+**Important:** For a production setup, configure authentication, TLS, network restrictions, and appropriate Elasticsearch access controls. The above examples assume a local lab with HTTP access enabled.
+
+### Practice Questions:
+
+1. What is Elasticsearch?
+2. What is an index and a document?
+3. What is the difference between a primary shard and a replica shard?
+4. How do you check Elasticsearch cluster health?
+5. What happens when an Elasticsearch node becomes unavailable?
+
+---
+
+## 3. Logstash – Log Processing and Parsing
+
+### Objective:
+Understand how Logstash collects, filters, and forwards log events.
+
+### Logstash Pipeline Structure:
+
+```text
+Input  →  Filter  →  Output
+```
+
+### Sample Logstash Configuration:
+
+Create a configuration file:
+
+```bash
+sudo mkdir -p /etc/logstash/conf.d
+sudo vi /etc/logstash/conf.d/sre-logs.conf
+```
+
+Example configuration:
+
+```ruby
+input {
+  file {
+    path => "/var/log/sre-app.log"
+    start_position => "beginning"
+    sincedb_path => "/tmp/logstash-sincedb"
+  }
+}
+
+filter {
+  grok {
+    match => {
+      "message" => "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} %{GREEDYDATA:log_message}"
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "sre-logs-%{+YYYY.MM.dd}"
+  }
+
+  stdout {
+    codec => rubydebug
+  }
+}
+```
+
+### Sample Log Format:
+
+```text
+2026-11-24T10:30:00 ERROR Database connection timeout
+2026-11-24T10:35:00 INFO Application started successfully
+2026-11-24T10:40:00 WARN High memory utilization detected
+```
+
+### Important Concepts:
+
+- Input: Defines the source of log events.
+- Filter: Parses and transforms log events.
+- Output: Sends processed events to Elasticsearch or another destination.
+- Grok: Extracts structured fields from unstructured text.
+- Mutate: Modifies event fields.
+- Date: Parses timestamps into a consistent date field.
+
+### Practice Questions:
+
+1. What is Logstash?
+2. Explain the input, filter, and output stages.
+3. What is Grok in Logstash?
+4. How do you troubleshoot a Logstash pipeline?
+5. What is the difference between Filebeat and Logstash?
+
+---
+
+## 4. Filebeat – Log Collection
+
+### Objective:
+Understand how Filebeat collects logs from servers and forwards them to Logstash or Elasticsearch.
+
+### Basic Linux Commands:
+
+Check Filebeat service:
+
+```bash
+sudo systemctl status filebeat
+```
+
+Start Filebeat:
+
+```bash
+sudo systemctl start filebeat
+```
+
+Enable Filebeat at startup:
+
+```bash
+sudo systemctl enable filebeat
+```
+
+Restart Filebeat after configuration changes:
+
+```bash
+sudo systemctl restart filebeat
+```
+
+Validate Filebeat configuration:
+
+```bash
+sudo filebeat test config
+```
+
+Test Logstash connectivity:
+
+```bash
+sudo filebeat test output
+```
+
+View Filebeat logs:
+
+```bash
+sudo journalctl -u filebeat -f
+```
+
+### Sample Filebeat Configuration:
+
+Example for forwarding logs to Logstash:
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: sre-application-logs
+    enabled: true
+    paths:
+      - /var/log/sre-app.log
+
+output.logstash:
+  hosts: ["localhost:5044"]
+```
+
+### Practice Questions:
+
+1. What is Filebeat?
+2. Why do we use Filebeat instead of directly sending every log file to Elasticsearch?
+3. How do you check whether Filebeat is running?
+4. How do you troubleshoot Filebeat connectivity issues?
+5. What is the difference between Filebeat and Metricbeat?
+
+---
+
+## 5. Kibana – Data Views and Dashboards
+
+### Objective:
+Practice log exploration and dashboard creation using Kibana.
+
+### Practical Steps:
+
+1. Open the Kibana interface.
+2. Navigate to Stack Management → Data Views.
+3. Create a Data View for the relevant Elasticsearch index pattern, such as `sre-logs-*`.
+4. Select the timestamp field if available.
+5. Navigate to Discover.
+6. Search and filter application logs.
+7. Open Visualize Library or Lens.
+8. Create visualizations and add them to a dashboard.
+
+### Example KQL Queries:
+
+Find ERROR logs:
+
+```text
+level : "ERROR"
+```
+
+Find WARN logs:
+
+```text
+level : "WARN"
+```
+
+Find logs for a particular service:
+
+```text
+service : "payment-service"
+```
+
+Find ERROR logs for a particular service:
+
+```text
+level : "ERROR" AND service : "payment-service"
+```
+
+### Dashboard Practice:
+
+Create a dashboard containing:
+
+1. Total number of log events.
+2. Pie chart showing log distribution by severity.
+3. Line chart showing log volume over time.
+4. Table showing recent ERROR messages.
+5. Filters for service name and log level.
+
+### Practice Questions:
+
+1. What is Kibana?
+2. What is a Data View?
+3. What is Kibana Discover?
+4. What is Kibana Lens?
+5. How do you create a dashboard for production error monitoring?
+
+---
+
+## 6. Terraform and Ansible – ELK Infrastructure Automation
+
+### Objective:
+Understand the responsibilities of Terraform and Ansible in ELK deployment.
+
+### Terraform Responsibilities:
+
+- Provision EC2 instances.
+- Configure security groups and networking.
+- Create infrastructure required for Elasticsearch, Logstash, and Kibana.
+- Manage infrastructure through configuration files.
+
+### Ansible Responsibilities:
+
+- Install required packages.
+- Configure Elasticsearch.
+- Install and configure Logstash.
+- Install and configure Filebeat.
+- Manage service startup and configuration updates.
+
+### Basic Ansible Inventory:
+
+```ini
+[elasticsearch]
+es-server ansible_host=10.0.1.10
+
+[logstash]
+logstash-server ansible_host=10.0.1.20
+
+[kibana]
+kibana-server ansible_host=10.0.1.30
+```
+
+### Basic Ansible Playbook Example:
+
+```yaml
+---
+- name: Install and start Filebeat
+  hosts: application_servers
+  become: true
+
+  tasks:
+    - name: Install Filebeat package
+      ansible.builtin.package:
+        name: filebeat
+        state: present
+
+    - name: Enable and start Filebeat
+      ansible.builtin.service:
+        name: filebeat
+        state: started
+        enabled: true
+```
+
+### Useful Commands:
+
+Check Ansible inventory:
+
+```bash
+ansible-inventory -i inventory.ini --list
+```
+
+Test connectivity:
+
+```bash
+ansible all -i inventory.ini -m ping
+```
+
+Run a playbook:
+
+```bash
+ansible-playbook -i inventory.ini install-filebeat.yml
+```
+
+Validate YAML formatting and indentation before running playbooks.
+
+### Practice Questions:
+
+1. What is the difference between Terraform and Ansible?
+2. Why do we use Ansible for ELK installation?
+3. What is an Ansible inventory?
+4. What is an Ansible playbook?
+5. How do you troubleshoot an Ansible connection failure?
+
+---
+
+## 7. ELK Troubleshooting Scenarios – SRE Perspective
+
+### Scenario 1: Logs are not visible in Kibana.
+
+Possible troubleshooting steps:
+
+1. Check whether the application is generating logs.
+2. Verify the log file path and file permissions.
+3. Check Filebeat service status.
+4. Run `filebeat test config` and `filebeat test output`.
+5. Check Logstash pipeline configuration and service logs.
+6. Verify Elasticsearch cluster health and index creation.
+7. Confirm that the Kibana Data View matches the actual index name.
+
+### Scenario 2: Filebeat cannot connect to Logstash.
+
+Check:
+
+```bash
+sudo systemctl status filebeat
+sudo journalctl -u filebeat -n 100
+sudo ss -lntp | grep 5044
+```
+
+Verify:
+
+- Logstash is running.
+- The Beats input is configured on the expected port.
+- Network and security group rules allow the connection.
+- Filebeat output host and port are correct.
+- TLS settings match on both sides, if enabled.
+
+### Scenario 3: Elasticsearch cluster status is RED.
+
+Check:
+
+```bash
+curl -X GET "http://localhost:9200/_cluster/health?pretty"
+```
+
+Check shard allocation:
+
+```bash
+curl -X GET "http://localhost:9200/_cat/shards?v"
+```
+
+Investigate:
+
+- Unassigned primary shards.
+- Node availability.
+- Disk space and disk watermarks.
+- Elasticsearch logs.
+- Recent configuration or infrastructure changes.
+
+### Scenario 4: Logs are delayed in Kibana.
+
+Investigate:
+
+- Filebeat publishing delays.
+- Logstash queue and processing bottlenecks.
+- Elasticsearch indexing and resource utilization.
+- Network latency between components.
+- Incorrect event timestamps or Kibana time filters.
+
+### Scenario 5: Elasticsearch disk usage is increasing rapidly.
+
+Investigate:
+
+- Index size and daily log volume.
+- Unnecessary debug-level logging.
+- Index Lifecycle Management policies.
+- Retention requirements.
+- Shard sizing and replica configuration.
+
+---
+
+## 8. Elasticsearch Best Practices – ILM, Shards, and Replicas
+
+### Index Lifecycle Management (ILM):
+
+ILM helps manage index lifecycle operations such as:
+
+- Hot phase: Frequently accessed and actively written logs.
+- Warm phase: Less frequently accessed logs.
+- Cold phase: Older logs that are accessed less frequently.
+- Delete phase: Remove data after the configured retention period.
+
+### Shards and Replicas:
+
+- Primary shards distribute index data across the cluster.
+- Replica shards provide additional copies of primary shard data.
+- Replicas can improve search capacity and provide fault tolerance.
+- Replica placement should be planned across separate nodes or failure zones.
+
+### Important Commands:
+
+Check shard allocation:
+
+```bash
+curl -X GET "http://localhost:9200/_cat/shards?v"
+```
+
+Check node information:
+
+```bash
+curl -X GET "http://localhost:9200/_cat/nodes?v"
+```
+
+Check index storage:
+
+```bash
+curl -X GET "http://localhost:9200/_cat/indices?v"
+```
+
+---
+
+## 9. SRE Interview Questions – ELK Stack
+
+1. Explain the ELK Stack architecture.
+2. What is the difference between Elasticsearch, Logstash, and Kibana?
+3. What is Filebeat, and why is it required?
+4. How do you troubleshoot missing logs in Kibana?
+5. What happens if Logstash stops processing logs?
+6. How do you troubleshoot Elasticsearch cluster health?
+7. What are primary shards and replica shards?
+8. What is Index Lifecycle Management?
+9. How do you manage log retention in Elasticsearch?
+10. How would you monitor logs from multiple EC2 instances?
+11. How can you collect logs from Kubernetes pods?
+12. How do Terraform and Ansible help deploy ELK infrastructure?
+13. What is Grok parsing in Logstash?
+14. How would you investigate a sudden increase in ERROR logs?
+15. How can centralized logging help during a P1 production incident?
+
+---
+
+## 10. Daily Completion Checklist
+
+- [ ] Understand centralized logging architecture.
+- [ ] Understand Elasticsearch, Logstash, Kibana, and Filebeat.
+- [ ] Practice basic Elasticsearch APIs.
+- [ ] Understand Logstash input, filter, and output.
+- [ ] Practice Filebeat configuration and service commands.
+- [ ] Create a Kibana Data View.
+- [ ] Create basic Kibana visualizations and dashboards.
+- [ ] Understand Terraform and Ansible responsibilities.
+- [ ] Review ELK troubleshooting scenarios.
+- [ ] Understand ILM, shards, and replicas.
+- [ ] Revise SRE interview questions.
+
+## Important Notes
+
+1. Filebeat is a lightweight log shipper; Logstash is a more flexible processing pipeline.
+2. Elasticsearch is responsible for indexing and searching log data.
+3. Kibana is used for searching, analyzing, and visualizing Elasticsearch data.
+4. ILM helps control storage growth through lifecycle and retention policies.
+5. Shards distribute data, while replicas provide additional copies for resilience.
+6. In production, secure communication with TLS, enable authentication, restrict network access, and protect credentials.
+7. Always monitor disk utilization, JVM heap, indexing latency, cluster health, and ingestion delays.
+8. Delete lab infrastructure and resources after practice to avoid unnecessary cloud charges.

@@ -1,0 +1,749 @@
+# Day 18 – Kubernetes Operations and ArgoCD | Hands-on Practice
+
+## 1. Kubernetes Cluster and Node Management
+
+### Objective:
+Understand Kubernetes nodes and practice basic node administration operations.
+
+### Check cluster information:
+
+```bash
+kubectl cluster-info
+kubectl get nodes -o wide
+kubectl get pods -A
+```
+
+Check node details:
+
+```bash
+kubectl describe node <node-name>
+```
+
+Check node resource utilization:
+
+```bash
+kubectl top nodes
+kubectl top pods -A
+```
+
+### Cordon Operation
+
+**Objective:** Prevent new pods from being scheduled on a node during maintenance.
+
+```bash
+kubectl cordon <node-name>
+```
+
+Verify node status:
+
+```bash
+kubectl get nodes
+```
+
+Expected result: The node should show `SchedulingDisabled`.
+
+### Uncordon Operation
+
+**Objective:** Allow new pods to be scheduled on the node again.
+
+```bash
+kubectl uncordon <node-name>
+```
+
+### Drain Operation
+
+**Objective:** Safely evict eligible workloads from a node before maintenance.
+
+```bash
+kubectl drain <node-name> --ignore-daemonsets
+```
+
+Important considerations:
+
+- Drain marks the node unschedulable and evicts eligible pods.
+- DaemonSet-managed pods are not deleted by the normal drain operation.
+- PodDisruptionBudgets can prevent or delay eviction.
+- Pods managed by controllers such as Deployments can be recreated on other suitable nodes.
+- Check local storage and standalone pods before draining.
+- Avoid using `--force` or `--delete-emptydir-data` without understanding the impact.
+
+After maintenance:
+
+```bash
+kubectl uncordon <node-name>
+```
+
+### Practice Questions:
+
+1. What is the difference between cordon and drain?
+2. Why do we drain a node before maintenance?
+3. What happens to Deployment-managed pods after a drain?
+4. What is a PodDisruptionBudget?
+5. Why are DaemonSet pods treated differently during drain?
+
+---
+
+## 2. Kubernetes Scaling and Troubleshooting
+
+### Objective:
+Practice workload scaling and investigate common production issues.
+
+### Deploy a sample application:
+
+```bash
+kubectl create deployment nginx --image=nginx
+```
+
+Check deployment and pods:
+
+```bash
+kubectl get deployments
+kubectl get pods -o wide
+```
+
+Scale the deployment:
+
+```bash
+kubectl scale deployment nginx --replicas=3
+```
+
+Verify replica count:
+
+```bash
+kubectl get deployment nginx
+kubectl get pods
+```
+
+Expose the deployment:
+
+```bash
+kubectl expose deployment nginx --port=80 --type=ClusterIP
+```
+
+Check service:
+
+```bash
+kubectl get services
+```
+
+### Troubleshooting Commands:
+
+Check pod status:
+
+```bash
+kubectl get pods -A
+```
+
+Describe a pod:
+
+```bash
+kubectl describe pod <pod-name>
+```
+
+View container logs:
+
+```bash
+kubectl logs <pod-name>
+```
+
+View logs from a previous crashed container:
+
+```bash
+kubectl logs <pod-name> --previous
+```
+
+Check namespace events:
+
+```bash
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+
+Check deployment details:
+
+```bash
+kubectl describe deployment nginx
+```
+
+### Common Kubernetes Issues:
+
+**Pending:**
+- Check node availability.
+- Check CPU and memory requests.
+- Review node selectors, affinity, taints, and tolerations.
+- Inspect pod events for scheduling failures.
+
+**CrashLoopBackOff:**
+- Check application logs.
+- Inspect the previous container logs.
+- Verify environment variables and configuration.
+- Check startup, readiness, and liveness probes.
+- Investigate application errors and resource constraints.
+
+**ImagePullBackOff:**
+- Verify image name and tag.
+- Check registry connectivity.
+- Validate image pull secrets.
+- Confirm that the image exists and the credentials are valid.
+
+**OOMKilled:**
+- Review container memory limits and actual usage.
+- Inspect application memory behavior.
+- Check whether memory requests and limits are appropriate.
+
+### Practice Questions:
+
+1. How do you scale a Kubernetes deployment?
+2. What is the difference between horizontal pod scaling and node scaling?
+3. How do you troubleshoot a Pending pod?
+4. How do you investigate CrashLoopBackOff?
+5. What causes OOMKilled?
+6. How do you check CPU and memory utilization?
+
+---
+
+## 3. GitOps Fundamentals
+
+### Objective:
+Understand how GitOps manages Kubernetes deployments through Git repositories.
+
+### Traditional Deployment Approach:
+
+```text
+Developer
+    |
+    v
+Manual kubectl commands
+    |
+    v
+Kubernetes Cluster
+```
+
+### GitOps Deployment Approach:
+
+```text
+Developer
+    |
+    v
+Git Repository
+    |
+    v
+ArgoCD
+    |
+    v
+Kubernetes Cluster
+```
+
+### Important Concepts:
+
+- Git is the source of truth for the desired application configuration.
+- ArgoCD continuously monitors configured repositories.
+- ArgoCD compares the desired state in Git with the actual cluster state.
+- Sync applies the desired configuration to the cluster.
+- Reconciliation helps detect and correct configuration drift.
+- Git history provides a record of configuration changes.
+
+### Practice Questions:
+
+1. What is GitOps?
+2. What is the difference between traditional CI/CD and GitOps?
+3. Why is Git considered the source of truth?
+4. What is configuration drift?
+5. How does ArgoCD detect changes in a Git repository?
+
+---
+
+## 4. ArgoCD Installation Using Helm
+
+### Objective:
+Understand how to install ArgoCD in a Kubernetes lab environment.
+
+### Step 1: Add the ArgoCD Helm Repository
+
+```bash
+helm repo add argo https://argoproj.github.io/argo-helm
+```
+
+Update Helm repositories:
+
+```bash
+helm repo update
+```
+
+### Step 2: Create an ArgoCD Namespace
+
+```bash
+kubectl create namespace argocd
+```
+
+### Step 3: Install ArgoCD
+
+```bash
+helm install argocd argo/argo-cd \
+  --namespace argocd
+```
+
+### Step 4: Verify Installation
+
+```bash
+kubectl get pods -n argocd
+kubectl get services -n argocd
+```
+
+Wait until the required ArgoCD pods are running and healthy.
+
+### Step 5: Access ArgoCD UI in a Lab
+
+Port-forward the ArgoCD server service:
+
+```bash
+kubectl port-forward svc/argocd-server \
+  -n argocd 8080:443
+```
+
+Open:
+
+```text
+https://localhost:8080
+```
+
+### Step 6: Retrieve Initial Admin Password
+
+```bash
+kubectl get secret argocd-initial-admin-secret \
+  -n argocd \
+  -o jsonpath="{.data.password}" | base64 -d
+```
+
+**Security note:** This is a lab-only initial login approach. Change the initial password and follow your organization's authentication and access-control practices. Do not expose the ArgoCD server publicly without appropriate authentication, TLS, and network restrictions.
+
+### Practice Questions:
+
+1. What is ArgoCD?
+2. Why do we install ArgoCD in a separate namespace?
+3. How can we install ArgoCD using Helm?
+4. How do you access the ArgoCD UI?
+5. What are the major components of ArgoCD?
+
+---
+
+## 5. ArgoCD Application and Git Repository Integration
+
+### Objective:
+Create an ArgoCD Application that deploys Kubernetes manifests from Git.
+
+### Sample Git Repository Structure:
+
+```text
+kubernetes-gitops/
+|
+|-- deployment.yaml
+|-- service.yaml
+```
+
+### Sample Deployment Manifest:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+```
+
+### Sample Service Manifest:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+```
+
+Commit and push these manifests to your Git repository.
+
+### Sample ArgoCD Application Manifest:
+
+Replace the repository URL and target revision with your own values.
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-app
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/<username>/kubernetes-gitops.git
+    targetRevision: main
+    path: .
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+```
+
+Apply the Application:
+
+```bash
+kubectl apply -f application.yaml
+```
+
+Check application status:
+
+```bash
+kubectl get applications -n argocd
+```
+
+Check deployed resources:
+
+```bash
+kubectl get pods,services -n default
+```
+
+### Practice Questions:
+
+1. What is an ArgoCD Application?
+2. What are `repoURL`, `targetRevision`, and `path`?
+3. What is the destination server?
+4. How does ArgoCD identify which Kubernetes resources to deploy?
+5. What happens if the Git manifest changes?
+
+---
+
+## 6. ArgoCD Sync Policies and Rollbacks
+
+### Objective:
+Understand manual synchronization, automated synchronization, and rollback strategies.
+
+### Manual Sync:
+
+- ArgoCD detects differences between Git and the cluster.
+- The Application shows an OutOfSync status.
+- An operator reviews the changes and triggers Sync.
+- ArgoCD applies the desired state from Git.
+
+### Automated Sync:
+
+Example:
+
+```yaml
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+```
+
+Important concepts:
+
+- **Automated Sync:** Applies Git changes without manually triggering synchronization.
+- **Prune:** Removes managed resources that are no longer present in Git.
+- **Self-Heal:** Reconciles supported live-state changes back toward the desired Git state.
+- **OutOfSync:** Indicates a difference between the desired and live state.
+- **Synced:** Indicates that the application resources match the desired state according to ArgoCD's comparison.
+
+**Important:** Enable automated pruning and self-healing only after understanding their impact. Incorrect Git changes can affect production resources.
+
+### Rollback Using Git:
+
+Example scenario:
+
+- Current application version: `nginx:1.27`
+- New version: `nginx:1.28`
+- New version causes an application issue.
+
+Update the Git manifest to restore the previous known-good image:
+
+```yaml
+image: nginx:1.27
+```
+
+Commit and push the change.
+
+ArgoCD will detect the Git change and synchronize it according to the configured sync policy.
+
+### Useful Commands:
+
+```bash
+argocd app list
+argocd app get nginx-app
+argocd app sync nginx-app
+argocd app history nginx-app
+```
+
+For GitOps-managed applications, prefer reverting the Git commit or updating the manifest to a known-good version. Avoid making manual cluster changes that conflict with the Git source of truth.
+
+### Practice Questions:
+
+1. What is the difference between manual and automated sync?
+2. What is self-healing in ArgoCD?
+3. What is pruning?
+4. How do you roll back a failed deployment in GitOps?
+5. What happens when the cluster state differs from the Git repository?
+
+---
+
+## 7. Kubernetes Secrets and GitOps Security
+
+### Objective:
+Understand how sensitive information should be managed in Kubernetes and GitOps workflows.
+
+### Create a Lab Secret:
+
+```bash
+kubectl create secret generic app-secret \
+  --from-literal=username=admin \
+  --from-literal=password='lab-password'
+```
+
+Check the Secret:
+
+```bash
+kubectl get secrets
+kubectl describe secret app-secret
+```
+
+View Secret keys and encoded data:
+
+```bash
+kubectl get secret app-secret -o yaml
+```
+
+### Important Security Concepts:
+
+- Kubernetes Secret values are base64-encoded by default, not automatically encrypted just because they are encoded.
+- Enable encryption at rest for Kubernetes Secrets where supported.
+- Restrict Secret access through Kubernetes RBAC.
+- Avoid committing plain-text credentials or Secret manifests containing real sensitive values to Git.
+- Use an appropriate secrets-management solution for production.
+- Consider External Secrets Operator or a supported secret-management integration when integrating external secret stores with Kubernetes.
+
+### Practice Questions:
+
+1. What is a Kubernetes Secret?
+2. Is base64 encoding the same as encryption?
+3. Why should we not store plain-text passwords in Git?
+4. How can we manage secrets securely in GitOps?
+5. What is the role of RBAC in Secret management?
+
+---
+
+## 8. Real-world Kubernetes and ArgoCD Troubleshooting
+
+### Scenario 1: ArgoCD Application Shows OutOfSync.
+
+Investigate:
+
+1. Check the ArgoCD Application status.
+2. Review the Git repository and latest commit.
+3. Compare the desired and live Kubernetes manifests.
+4. Check whether someone manually changed resources in the cluster.
+5. Review synchronization settings and any ignored-difference rules.
+6. Sync only after reviewing the proposed changes.
+
+Useful command:
+
+```bash
+argocd app get nginx-app
+```
+
+### Scenario 2: ArgoCD Application Shows Degraded.
+
+Investigate:
+
+1. Check the Application health status.
+2. Identify unhealthy Kubernetes resources.
+3. Check pod status and events.
+4. Review application logs.
+5. Verify image availability, configuration, and resource limits.
+6. Fix the root cause and confirm the Application returns to Healthy.
+
+Useful commands:
+
+```bash
+kubectl get pods -A
+kubectl get events -A --sort-by=.metadata.creationTimestamp
+kubectl describe pod <pod-name>
+kubectl logs <pod-name>
+```
+
+### Scenario 3: Kubernetes Node Is Not Ready.
+
+Investigate:
+
+```bash
+kubectl get nodes
+kubectl describe node <node-name>
+kubectl get pods -A -o wide
+```
+
+Check:
+
+- Node CPU and memory pressure.
+- Disk pressure.
+- Kubelet status.
+- Network connectivity.
+- Node conditions and recent events.
+- Infrastructure and security group configuration.
+
+### Scenario 4: Worker Node Cannot Communicate with the Cluster.
+
+Investigate:
+
+- Verify node network connectivity.
+- Check security group inbound and outbound rules.
+- Validate required Kubernetes control-plane communication.
+- Check routing tables and network ACLs.
+- Review DNS resolution.
+- Inspect kubelet logs and node registration status.
+
+For AWS EKS, validate the cluster endpoint access configuration and the required networking rules for the node group.
+
+### Scenario 5: ArgoCD Cannot Access the Git Repository.
+
+Investigate:
+
+- Verify repository URL.
+- Check repository credentials or SSH key configuration.
+- Validate network connectivity.
+- Check TLS certificate trust.
+- Review repository connection status in ArgoCD.
+- Confirm the requested branch and manifest path exist.
+
+### Scenario 6: Deployment Fails After a Git Commit.
+
+Investigate:
+
+1. Check the latest Git commit.
+2. Review manifest syntax and configuration.
+3. Inspect ArgoCD sync errors.
+4. Check Kubernetes events.
+5. Verify image tags and registry credentials.
+6. Restore the previous working configuration through Git if required.
+
+---
+
+## 9. Managing Multiple Kubernetes Clusters with GitOps
+
+### Objective:
+Understand how GitOps can support deployments across multiple clusters.
+
+### Example Architecture:
+
+```text
+                Git Repository
+                      |
+                      v
+                   ArgoCD
+                      |
+          +-----------+-----------+
+          |           |           |
+          v           v           v
+       Cluster A   Cluster B   Cluster C
+          |           |           |
+          v           v           v
+       App Pods    App Pods    App Pods
+```
+
+### Important Concepts:
+
+- Register multiple Kubernetes clusters with ArgoCD.
+- Maintain environment-specific configuration.
+- Use separate branches, directories, or Helm values for different environments.
+- Apply role-based access controls.
+- Use pull requests and approvals before production changes.
+- Monitor Application health and synchronization status.
+- Avoid applying the same configuration blindly across every environment.
+
+### Practice Questions:
+
+1. How does ArgoCD manage multiple Kubernetes clusters?
+2. How can we maintain separate development, staging, and production configurations?
+3. Why are pull request approvals important?
+4. How do you prevent an incorrect deployment from reaching production?
+5. What are the advantages of GitOps for large Kubernetes environments?
+
+---
+
+## 10. SRE Interview Questions – Kubernetes and ArgoCD
+
+1. Explain Kubernetes node management.
+2. What is the difference between cordon, drain, and uncordon?
+3. What happens when you drain a worker node?
+4. How do you troubleshoot a node in NotReady state?
+5. How do you scale a Kubernetes deployment?
+6. What is GitOps?
+7. What is ArgoCD, and why do we use it?
+8. Explain the end-to-end ArgoCD deployment workflow.
+9. What is the difference between Sync and Refresh?
+10. What is the difference between Synced and Healthy?
+11. Explain automated sync, self-heal, and prune.
+12. How do you roll back an unsuccessful deployment using Git?
+13. How do you troubleshoot an ArgoCD OutOfSync application?
+14. How do you manage secrets securely in GitOps?
+15. How can ArgoCD manage multiple Kubernetes clusters?
+16. What happens if someone manually changes a resource managed by ArgoCD?
+17. How do you troubleshoot worker-node connectivity issues in AWS EKS?
+18. Why are pull request reviews and approval workflows important in production deployments?
+
+---
+
+## 11. Daily Completion Checklist
+
+- [ ] Understand Kubernetes node management.
+- [ ] Practice cordon, drain, and uncordon operations.
+- [ ] Practice deployment scaling.
+- [ ] Review Pending, CrashLoopBackOff, and OOMKilled troubleshooting.
+- [ ] Understand GitOps architecture.
+- [ ] Install ArgoCD using Helm in a lab environment.
+- [ ] Connect a Git repository to ArgoCD.
+- [ ] Deploy an application through ArgoCD.
+- [ ] Practice manual and automated synchronization.
+- [ ] Understand self-healing and pruning.
+- [ ] Practice rollback using Git.
+- [ ] Review Kubernetes Secrets and GitOps security.
+- [ ] Understand multi-cluster deployment concepts.
+- [ ] Revise SRE interview questions.
+
+## Important Notes
+
+1. Kubernetes is responsible for container orchestration, scheduling, and workload management.
+2. Cordon prevents new pods from being scheduled on a node; drain evicts eligible workloads for maintenance.
+3. ArgoCD is a declarative GitOps continuous delivery tool for Kubernetes.
+4. Git acts as the source of truth for the desired application configuration.
+5. ArgoCD continuously compares the desired state with the live cluster state.
+6. Automated sync, self-healing, and pruning should be configured carefully, especially in production.
+7. Git-based rollback is a reliable way to restore a previously known-good configuration.
+8. Never commit real credentials or plain-text passwords to Git repositories.
+9. Always review Kubernetes events, pod logs, node conditions, and ArgoCD application status during troubleshooting.
+10. Practice manual operations first, understand the impact, and then automate them.
+11. Use AI tools to understand errors and explore possible fixes, but validate commands and configuration changes before applying them.
+12. Clean up lab resources after practice to avoid unnecessary infrastructure costs.
