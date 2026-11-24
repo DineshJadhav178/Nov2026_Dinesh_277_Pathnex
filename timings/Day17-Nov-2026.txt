@@ -1,0 +1,50 @@
+# Day 17 – ELK Stack (Centralized Logging and Monitoring)
+
+## What I did today:
+
+1. **Centralized Logging – Introduction (1 Hour)**
+   - Understood the importance of centralized logging in production environments.
+   - Learned the challenges of manually checking logs across multiple EC2 instances and Kubernetes pods.
+   - Understood how centralized logging improves troubleshooting, observability, and incident investigation.
+   - Studied the basic log collection architecture: source servers → log agents → processing pipeline → storage → dashboards.
+
+2. **ELK Stack Architecture and Components (1 Hour)**
+   - Studied the three main ELK components: Elasticsearch, Logstash, and Kibana.
+   - Understood Logstash as a log collection and processing pipeline.
+   - Learned how Elasticsearch indexes and stores log data for fast searching and analytics.
+   - Explored Kibana for log exploration, dashboards, and visualizations.
+   - Understood the role of Filebeat as a lightweight log-shipping agent.
+
+3. **Infrastructure Provisioning and Automation (1 Hour)**
+   - Studied how Terraform can provision infrastructure required for an ELK environment.
+   - Understood how Ansible automates Elasticsearch, Logstash, and Filebeat installation and configuration.
+   - Reviewed Ansible inventory, variables, playbooks, and configuration management.
+   - Learned the importance of validating connectivity between ELK components.
+
+4. **Kibana Data Views and Dashboards (1 Hour)**
+   - Learned how to create Kibana Data Views for Elasticsearch indices or data streams.
+   - Explored log searching and filtering using Kibana.
+   - Understood how to create pie charts for event categories and line charts for log activity over time.
+   - Practiced the basic concepts of Kibana Lens and dashboard creation.
+
+5. **Troubleshooting and Log Analysis (1 Hour)**
+   - Studied common ELK connectivity and configuration issues.
+   - Understood how to troubleshoot Filebeat-to-Logstash and Logstash-to-Elasticsearch communication.
+   - Reviewed Ansible inventory, variable, and playbook troubleshooting.
+   - Learned how centralized logs help investigate application errors and production incidents.
+
+6. **ELK Best Practices and Scalability (1 Hour)**
+   - Studied Index Lifecycle Management (ILM) for managing log retention and storage.
+   - Understood Elasticsearch primary shards and replica shards.
+   - Learned how replicas support availability and how shards help distribute data across nodes.
+   - Reviewed basic capacity planning, retention, and monitoring considerations.
+
+## Tomorrow's Tasks:
+
+1. Build a basic ELK architecture in a lab environment.
+2. Install and configure Elasticsearch, Logstash, Kibana, and Filebeat.
+3. Configure Filebeat to collect Linux system logs.
+4. Practice Logstash input, filter, and output configuration.
+5. Explore Elasticsearch queries and Kibana dashboards.
+6. Practice troubleshooting common ELK connectivity and configuration issues.
+7. Revise ELK architecture and prepare SRE interview questions.
