@@ -1,0 +1,23 @@
+# Day 13 – DevSecOps & AIOps Session Timing Log
+
+## What I did today:
+
+1. 1 hour – DevSecOps fundamentals: Understanding cloud platforms (AWS, Azure, GCP), CI/CD pipelines and security integration.
+2. 1 hour – Security tools revision: SonarQube, Trivy, Snyk, secret scanning and vulnerability assessment.
+3. 1 hour – DevOps daily operations: Incident management, Kubernetes cluster maintenance and Terraform-based infrastructure automation.
+4. 1 hour – AIOps concepts: Generative AI, RAG-based log analysis, multi-agent workflows and AI-driven operational automation.
+5. 1 hour – DevSecOps best practices: Docker image security, Jenkins security, secret management and Shift-Left Security.
+6. 30 minutes – Software Bill of Materials (SBOM), dependency scanning and software supply-chain security.
+7. 30 minutes – Scenario-based interview preparation: Critical production bugs, security guardrail failures and accidental secret commits.
+8. 30 minutes – English speaking and explaining DevSecOps/AIOps concepts in simple technical language.
+
+## Tomorrow's tasks:
+
+1. Practice Docker image vulnerability scanning using Trivy.
+2. Configure a basic Jenkins CI/CD pipeline with SonarQube integration.
+3. Practice Terraform security and secrets management.
+4. Understand SBOM generation and dependency scanning.
+5. 1 hour – Python scripting for log analysis and operational automation.
+6. Practice 10 DevSecOps and AIOps scenario-based interview questions.
+7. Revise Kubernetes security concepts and RBAC.
+8. English speaking and mock interview practice.
