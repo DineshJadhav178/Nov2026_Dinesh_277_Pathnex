@@ -1,4 +1,4 @@
-# Day 03 – Git & GitHub Coding Practice
+# Day 03 – Git & GitHub Coding Practice:
 
 ## 1. Git Fundamentals – Command Practice
 
