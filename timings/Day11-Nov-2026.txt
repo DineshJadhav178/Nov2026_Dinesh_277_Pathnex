@@ -1,0 +1,76 @@
+# Day 10 – AWS Cloud Engineering Fundamentals
+
+## Topics Covered
+
+### 1. Introduction to Cloud Computing
+- Understanding cloud computing and its importance in modern IT infrastructure.
+- Difference between cloud computing and traditional on-premises infrastructure.
+- Understanding rented cloud infrastructure versus physical data centers.
+- Benefits of cloud computing: scalability, flexibility, availability and cost optimization.
+- Introduction to AWS and its global cloud infrastructure.
+
+### 2. Cloud Service Models
+- Understanding Infrastructure as a Service (IaaS).
+- Understanding Platform as a Service (PaaS).
+- Understanding Software as a Service (SaaS).
+- Differences between IaaS, PaaS and SaaS.
+- Real-world examples and use cases of different cloud service models.
+- Understanding shared responsibility between cloud providers and customers.
+
+### 3. AWS Governance and Security
+- Introduction to AWS Landing Zones.
+- Understanding AWS Control Tower for multi-account management.
+- Understanding AWS Config for resource configuration monitoring and compliance.
+- Introduction to centralized governance and account management.
+- Understanding security, compliance and resource auditing.
+
+### 4. AWS Identity and Access Management (IAM)
+- Introduction to AWS IAM.
+- Understanding authentication and authorization.
+- Difference between IAM users, groups, roles and policies.
+- Understanding managed policies and customer-managed policies.
+- Understanding Amazon Resource Names (ARNs).
+- Introduction to least-privilege access management.
+- Understanding secure access to AWS resources.
+
+### 5. Amazon EC2 Fundamentals
+- Introduction to Amazon Elastic Compute Cloud (EC2).
+- Understanding virtual machines and cloud servers.
+- Introduction to EC2 instance types and use cases.
+- Understanding basic EC2 provisioning through the AWS Console.
+- Introduction to AMIs, key pairs and security groups.
+
+### 6. AWS Console and Practical Learning
+- Navigating the AWS Management Console.
+- Understanding AWS services and regional infrastructure.
+- Exploring IAM and EC2 dashboards.
+- Understanding the importance of practical cloud projects.
+- Learning how AWS services are used in real-world DevOps and SRE environments.
+
+### 7. Career and Interview Preparation
+- Understanding AWS Cloud Engineer and DevOps career opportunities.
+- Importance of consistent learning and hands-on practice.
+- Preparing for AWS fundamentals interview questions.
+- Building practical projects instead of relying only on theoretical knowledge.
+
+## Time Allocation
+
+| Topic | Duration |
+|---|---:|
+| Cloud computing and on-premises infrastructure | 45 minutes |
+| IaaS, PaaS and SaaS | 1 hour |
+| AWS Landing Zone, Control Tower and Config | 1 hour |
+| IAM, authentication, authorization and policies | 1 hour |
+| EC2 fundamentals and AWS Console | 1 hour |
+| Career guidance and interview preparation | 30 minutes |
+| **Total** | **5 hours 15 minutes** |
+
+## Tomorrow's Tasks
+1. Practice AWS IAM users, groups, roles and policies.
+2. Understand IAM JSON policy structure and ARN formats.
+3. Create and explore EC2 instances using the AWS Console.
+4. Practice security groups, key pairs and AMI concepts.
+5. Understand AWS Regions, Availability Zones and Edge Locations.
+6. Practice basic AWS CLI commands.
+7. Prepare AWS Cloud and IAM interview questions.
+8. Practice explaining cloud concepts in English.

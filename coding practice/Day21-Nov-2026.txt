@@ -1,0 +1,459 @@
+# Day 21 – End-to-End DevOps Workflow | Hands-on Practice
+
+## 1. Infrastructure as Code (Terraform)
+
+### Objective
+Understand how Terraform provisions and manages infrastructure through configuration files.
+
+### Important Terraform commands
+
+```bash
+terraform version
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply
+terraform show
+terraform state list
+```
+
+### Basic Terraform example
+
+Create a file named `main.tf`:
+
+```hcl
+terraform {
+  required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5"
+    }
+  }
+}
+
+resource "local_file" "devops_practice" {
+  filename = "${path.module}/devops.txt"
+  content  = "Practicing Terraform Infrastructure as Code"
+}
+```
+
+Run:
+
+```bash
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply
+```
+
+Verify:
+
+```bash
+cat devops.txt
+terraform state list
+```
+
+Clean up this local practice resource:
+
+```bash
+terraform destroy
+```
+
+### Important concepts
+
+- **IaC:** Managing infrastructure using configuration files.
+- **Terraform state:** Tracks resources managed by Terraform.
+- **Terraform plan:** Shows proposed infrastructure changes.
+- **Terraform apply:** Applies the planned changes.
+- **Terraform destroy:** Removes managed resources.
+
+**Production note:** Never run `terraform apply` or `terraform destroy` against a shared or production environment without authorization, review, and an approved change process.
+
+---
+
+## 2. GitOps and ArgoCD
+
+### Objective
+Understand how ArgoCD deploys Kubernetes applications from a Git repository.
+
+### GitOps workflow
+
+1. Developer updates Kubernetes YAML files.
+2. Changes are pushed to GitHub.
+3. ArgoCD detects the repository changes.
+4. ArgoCD compares the desired state with the actual cluster state.
+5. ArgoCD synchronizes the application when required.
+6. Kubernetes maintains the declared desired state.
+
+### Important ArgoCD concepts
+
+| Concept | Description |
+|---|---|
+| Git Repository | Stores Kubernetes manifests |
+| Application | Connects Git configuration to a cluster |
+| Sync | Applies the desired Git state |
+| Healthy | Application resources are healthy |
+| OutOfSync | Actual state differs from Git |
+| Self-healing | Corrects supported live changes to match Git |
+| Pruning | Removes resources no longer declared in Git, when enabled |
+
+### Useful ArgoCD CLI commands
+
+```bash
+argocd version
+argocd app list
+argocd app get <application-name>
+argocd app sync <application-name>
+argocd app history <application-name>
+argocd app diff <application-name>
+```
+
+### Practice task
+
+- Create a sample GitHub repository.
+- Add Kubernetes Deployment and Service YAML files.
+- Connect the repository to ArgoCD.
+- Create an ArgoCD Application.
+- Observe the application sync and health status.
+- Update the replica count in Git.
+- Push the changes and observe ArgoCD synchronization.
+- If self-healing is enabled, observe how ArgoCD handles supported manual changes.
+
+**Important:** Use Git commits to make desired changes. Avoid direct production modifications using `kubectl edit` because they can create configuration drift.
+
+---
+
+## 3. Kubernetes Application Deployment
+
+### Objective
+Deploy a sample application and understand its Kubernetes resources.
+
+Create `deployment.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-demo
+  template:
+    metadata:
+      labels:
+        app: nginx-demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+```
+
+Apply the deployment:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+Verify:
+
+```bash
+kubectl get deployments
+kubectl get pods -o wide
+kubectl describe deployment nginx-demo
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+
+### Create a Kubernetes Service
+
+Create `service.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-demo-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx-demo
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+```
+
+Apply and verify:
+
+```bash
+kubectl apply -f service.yaml
+kubectl get services
+kubectl describe service nginx-demo-service
+```
+
+---
+
+## 4. Kubernetes Troubleshooting – Pending Pods
+
+### Scenario
+An application pod is stuck in `Pending` status because the cluster does not have enough available resources.
+
+### Step 1: Check pod status
+
+```bash
+kubectl get pods -o wide
+```
+
+### Step 2: Describe the pod
+
+```bash
+kubectl describe pod <pod-name>
+```
+
+Check the Events section for messages such as:
+
+```text
+FailedScheduling
+Insufficient cpu
+Insufficient memory
+```
+
+### Step 3: Check worker nodes
+
+```bash
+kubectl get nodes
+kubectl describe nodes
+kubectl top nodes
+kubectl top pods
+```
+
+### Step 4: Check resource requests
+
+```bash
+kubectl get pod <pod-name> -o yaml
+```
+
+Review CPU and memory requests against available node capacity.
+
+### Step 5: Identify the solution
+
+Depending on the actual issue:
+
+- Review and right-size pod resource requests.
+- Add worker-node capacity.
+- Check node availability and scheduling constraints.
+- Verify taints, tolerations, affinity, and node selectors.
+- Use Cluster Autoscaler where configured and supported.
+
+**Interview explanation:**
+
+"If a pod is stuck in Pending status, I first check its status and use `kubectl describe pod` to review scheduling events. I check whether the issue is insufficient CPU or memory, node availability, taints, or scheduling constraints. Based on the root cause, I work on resource adjustment or additional node capacity."
+
+---
+
+## 5. Kubernetes Cluster Autoscaler
+
+### Objective
+Understand how Cluster Autoscaler increases or decreases worker-node capacity based on workload requirements.
+
+### How it works
+
+1. Application pods request CPU and memory.
+2. Kubernetes scheduler attempts to place pods on available nodes.
+3. If pods cannot be scheduled due to insufficient capacity, they remain Pending.
+4. Cluster Autoscaler checks whether adding a node can make those pods schedulable.
+5. It requests additional capacity from the configured node group or Auto Scaling Group.
+6. When nodes become available, Kubernetes schedules the pending pods.
+7. Scale-down can remove eligible underutilized nodes when workloads permit.
+
+### AWS-related components
+
+- IAM Role: Provides permissions for the autoscaler.
+- IAM Policy: Defines permitted AWS operations.
+- Service Account: Identity used by the Kubernetes workload.
+- IRSA or EKS Pod Identity: Provides AWS permissions to a workload.
+- Auto Scaling Group: Manages EC2 worker-node capacity.
+- Cluster Autoscaler: Adjusts node-group capacity based on scheduling requirements.
+
+### Important checks
+
+```bash
+kubectl get pods -n kube-system
+kubectl get deployments -n kube-system
+kubectl get nodes
+kubectl get events -A --sort-by=.metadata.creationTimestamp
+```
+
+If Cluster Autoscaler is installed:
+
+```bash
+kubectl logs -n kube-system deployment/cluster-autoscaler
+```
+
+Check:
+- Is Cluster Autoscaler running?
+- Does its service account have the required AWS permissions?
+- Are the node groups configured correctly?
+- Are minimum and maximum node counts configured?
+- Are there scheduling constraints preventing scale-up?
+- Are there errors in the autoscaler logs?
+
+**Important:** Cluster Autoscaler requires compatible node-group configuration and appropriate AWS permissions. Do not copy IAM policies or autoscaler manifests blindly from tutorials. Follow the version-specific AWS/EKS documentation and use least-privilege permissions.
+
+---
+
+## 6. New Relic – Kubernetes Observability
+
+### Objective
+Understand how New Relic collects and displays Kubernetes and application telemetry.
+
+### Key observability signals
+
+| Signal | What it helps monitor |
+|---|---|
+| Metrics | CPU, memory, pod restarts, node health |
+| Logs | Application and infrastructure errors |
+| Traces | Request flow across distributed services |
+
+### Kubernetes monitoring checklist
+
+- Cluster health and node availability.
+- Pod status and restart count.
+- CPU and memory utilization.
+- Container resource limits and requests.
+- Application response time.
+- HTTP 4xx and 5xx errors.
+- Application throughput.
+- Distributed request traces.
+
+### Example Kubernetes checks
+
+```bash
+kubectl get nodes
+kubectl get pods -A
+kubectl get deployments -A
+kubectl top nodes
+kubectl top pods -A
+kubectl get events -A
+```
+
+### New Relic integration overview
+
+1. Create or access an authorized New Relic account.
+2. Configure Kubernetes monitoring using the supported integration.
+3. Install the required infrastructure agent and Kubernetes integration, commonly through Helm.
+4. Configure the required license key securely.
+5. Verify that cluster and workload telemetry is being received.
+6. Open dashboards and inspect node, pod, and application health.
+7. Configure alerts for meaningful performance and availability conditions.
+
+**Security note:** Never hardcode a New Relic license key in a public GitHub repository. Use Kubernetes Secrets or an approved external secret-management solution. Follow your organization's access and credential policies.
+
+---
+
+## 7. End-to-End DevOps Workflow
+
+### Architecture flow
+
+```text
+Developer
+    |
+    v
+GitHub Repository
+    |
+    +----------------------+
+    |                      |
+    v                      v
+Terraform             Kubernetes YAML
+    |                      |
+    v                      v
+Cloud Infrastructure   ArgoCD
+                           |
+                           v
+                    Kubernetes Cluster
+                           |
+                 +---------+---------+
+                 |                   |
+                 v                   v
+           Application Pods     Cluster Autoscaler
+                 |                   |
+                 v                   v
+           Application Health   Additional Nodes
+                 |
+                 v
+             New Relic
+                 |
+                 v
+       Metrics, Logs and Traces
+                 |
+                 v
+          Dashboards and Alerts
+```
+
+### Workflow explanation
+
+- Terraform manages cloud infrastructure through code.
+- GitHub stores infrastructure and application configuration.
+- ArgoCD synchronizes the desired application state from Git.
+- Kubernetes runs and manages application workloads.
+- Cluster Autoscaler helps provide additional node capacity when required.
+- New Relic provides visibility into infrastructure and application performance.
+
+---
+
+## 8. Hands-on Practice Tasks
+
+- [ ] Create a Terraform local-file practice resource.
+- [ ] Practice `terraform init`, `plan`, `apply`, and `destroy`.
+- [ ] Create a GitHub repository for Kubernetes manifests.
+- [ ] Deploy an Nginx application using Kubernetes YAML.
+- [ ] Create a Kubernetes ClusterIP Service.
+- [ ] Connect the repository to ArgoCD in a lab environment.
+- [ ] Observe ArgoCD Sync and Health status.
+- [ ] Update replicas through Git and verify synchronization.
+- [ ] Investigate a Pending pod using `kubectl describe pod`.
+- [ ] Study Cluster Autoscaler architecture and AWS IAM permissions.
+- [ ] Explore New Relic dashboards and Kubernetes telemetry.
+
+## 9. Interview Questions
+
+1. What is Infrastructure as Code?
+2. Why do we use Terraform instead of manually creating infrastructure?
+3. Explain the Terraform workflow.
+4. What is GitOps?
+5. How does ArgoCD work with GitHub and Kubernetes?
+6. What is the difference between Sync and Self-Heal in ArgoCD?
+7. What happens when a pod is stuck in Pending status?
+8. How do you troubleshoot insufficient CPU or memory?
+9. What is Cluster Autoscaler?
+10. How does Cluster Autoscaler interact with AWS Auto Scaling Groups?
+11. Why does Cluster Autoscaler require IAM permissions?
+12. What is the difference between Horizontal Pod Autoscaler and Cluster Autoscaler?
+13. What is observability?
+14. What are metrics, logs, and distributed traces?
+15. How does New Relic help monitor Kubernetes applications?
+16. How would you troubleshoot an application that is running but responding slowly?
+
+## 10. Important Notes
+
+- Terraform helps automate and standardize infrastructure provisioning.
+- Git should be the source of truth in a GitOps workflow.
+- ArgoCD continuously compares the desired state with the actual Kubernetes state.
+- A Pending pod may indicate insufficient resources or other scheduling constraints.
+- Cluster Autoscaler manages worker-node capacity, whereas HPA manages pod replica counts.
+- New Relic helps monitor infrastructure and application health through telemetry.
+- Monitoring, alerting, and troubleshooting are important parts of production SRE operations.
+
+**Day 21 Outcome:** Understood the end-to-end DevOps workflow connecting Terraform, GitHub, ArgoCD, Kubernetes, Cluster Autoscaler, and New Relic. Practiced deployment and troubleshooting commands and learned how infrastructure automation, continuous deployment, dynamic scaling, and observability work together.

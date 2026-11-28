@@ -1,0 +1,1154 @@
+# Day 20 – SRE | Real-Time Production Troubleshooting and Monitoring – Hands-on Practice
+
+## 1. SRE Fundamentals – SLI, SLO, SLA, and Error Budget
+
+### Objective:
+Understand how SRE teams measure and maintain service reliability.
+
+### Important Concepts:
+
+- **SLI (Service Level Indicator):** A measurable metric representing service reliability or performance.
+- **SLO (Service Level Objective):** The reliability target defined for a service.
+- **SLA (Service Level Agreement):** A formal commitment to customers, often including consequences if targets are not met.
+- **Error Budget:** The amount of unreliability permitted within a defined period based on the SLO.
+- **Toil:** Repetitive manual operational work that provides little lasting value and can often be automated.
+
+### Example:
+
+Assume an application has an SLO of 99.2% availability.
+
+Error Budget:
+
+```text
+Error Budget = 100% - SLO
+
+Error Budget = 100% - 99.2%
+
+Error Budget = 0.8%
+```
+
+For a 30-day month:
+
+```text
+Total time = 30 × 24 × 60
+
+Total time = 43,200 minutes
+
+Allowed downtime = 43,200 × 0.008
+
+Allowed downtime = 345.6 minutes
+```
+
+### Python Practice – Error Budget Calculator
+
+```python
+slo = 99.2
+total_minutes = 30 * 24 * 60
+
+error_budget_percentage = 100 - slo
+
+allowed_downtime = (
+    total_minutes * error_budget_percentage / 100
+)
+
+print("SLO:", slo, "%")
+print("Error Budget:", error_budget_percentage, "%")
+print("Allowed Downtime:", allowed_downtime, "minutes")
+```
+
+### Practice Questions:
+
+1. What is the difference between SLI, SLO, and SLA?
+2. How do you calculate an Error Budget?
+3. What happens when the Error Budget is exhausted?
+4. What is toil in SRE?
+5. How does SRE balance reliability and innovation?
+
+---
+
+## 2. Linux Production Troubleshooting
+
+### Objective:
+Identify CPU, memory, disk, process, and system-level issues using Linux commands.
+
+### CPU Troubleshooting
+
+Check CPU and process utilization:
+
+```bash
+top
+```
+
+Alternative:
+
+```bash
+htop
+```
+
+Check CPU information:
+
+```bash
+lscpu
+```
+
+Find processes consuming the most CPU:
+
+```bash
+ps aux --sort=-%cpu | head -10
+```
+
+### Memory Troubleshooting
+
+Check memory utilization:
+
+```bash
+free -h
+```
+
+Find processes consuming the most memory:
+
+```bash
+ps aux --sort=-%mem | head -10
+```
+
+Check memory information:
+
+```bash
+cat /proc/meminfo
+```
+
+### Disk Troubleshooting
+
+Check filesystem utilization:
+
+```bash
+df -h
+```
+
+Check inode utilization:
+
+```bash
+df -i
+```
+
+Find directory sizes:
+
+```bash
+du -sh /var/log
+```
+
+Find large directories:
+
+```bash
+du -ah /var/log | sort -rh | head -10
+```
+
+### Process Troubleshooting
+
+List running processes:
+
+```bash
+ps -ef
+```
+
+Find a specific process:
+
+```bash
+ps -ef | grep nginx
+```
+
+Check open ports:
+
+```bash
+sudo ss -tulnp
+```
+
+### System Log Troubleshooting
+
+View recent system logs:
+
+```bash
+sudo journalctl -n 100
+```
+
+Follow live system logs:
+
+```bash
+sudo journalctl -f
+```
+
+Check logs for a particular service:
+
+```bash
+sudo journalctl -u nginx -n 100
+```
+
+### Practice Questions:
+
+1. How do you troubleshoot high CPU utilization in Linux?
+2. How do you identify memory-consuming processes?
+3. What is the difference between `df -h` and `du -sh`?
+4. What are inode issues?
+5. How do you investigate a Linux service failure?
+6. How do you identify which process is listening on a port?
+
+---
+
+## 3. Linux Network and Connectivity Troubleshooting
+
+### Objective:
+Understand how to investigate DNS, connectivity, port, and network-related issues.
+
+### Basic Commands:
+
+Check connectivity:
+
+```bash
+ping -c 4 google.com
+```
+
+Check DNS resolution:
+
+```bash
+nslookup google.com
+```
+
+Alternative:
+
+```bash
+dig google.com
+```
+
+Check HTTP response:
+
+```bash
+curl -I https://example.com
+```
+
+Check detailed HTTP connection:
+
+```bash
+curl -v https://example.com
+```
+
+Check a specific port:
+
+```bash
+nc -zv <hostname> <port>
+```
+
+Check listening ports:
+
+```bash
+sudo ss -tulnp
+```
+
+Trace network route:
+
+```bash
+traceroute google.com
+```
+
+### Common Network Issues:
+
+- DNS resolution failure.
+- Connection timeout.
+- Connection refused.
+- Firewall or security group restrictions.
+- Incorrect routing.
+- Application not listening on the expected port.
+- TLS certificate or handshake issues.
+
+### Practice Questions:
+
+1. What is the difference between connection timeout and connection refused?
+2. How do you troubleshoot DNS resolution issues?
+3. What is the purpose of `curl`?
+4. How do you check whether a port is open?
+5. What is the difference between TCP and UDP?
+
+---
+
+## 4. Monitoring and Observability – Prometheus and Grafana
+
+### Objective:
+Understand how infrastructure and application metrics are collected, stored, visualized, and monitored.
+
+### Monitoring Architecture:
+
+```text
+Linux / EC2 / Kubernetes / Application
+                  |
+                  v
+             Exporters
+                  |
+                  v
+              Prometheus
+          (Metrics Collection)
+                  |
+          +-------+-------+
+          |               |
+          v               v
+       Grafana        Alertmanager
+      Dashboards        Alerting
+```
+
+### Important Components:
+
+- **Prometheus:** Collects and stores time-series metrics.
+- **Node Exporter:** Exposes Linux system metrics.
+- **Grafana:** Creates dashboards and visualizes metrics.
+- **Alertmanager:** Handles alert grouping, routing, silencing, and notifications.
+- **PromQL:** Query language used to analyze Prometheus metrics.
+
+### Important Metrics:
+
+| Metric | What it indicates |
+|---|---|
+| CPU utilization | Processor usage |
+| Memory utilization | Memory consumption |
+| Disk utilization | Filesystem capacity |
+| Request rate | Application traffic |
+| Error rate | Failed application requests |
+| p95 latency | Response time experienced by 95% of requests |
+| Pod restarts | Container instability |
+| Node health | Kubernetes worker-node condition |
+
+### Sample PromQL Queries:
+
+CPU usage rate:
+
+```promql
+100 * (1 - avg by(instance) (
+  rate(node_cpu_seconds_total{mode="idle"}[5m])
+))
+```
+
+Memory utilization:
+
+```promql
+100 * (
+  1 - node_memory_MemAvailable_bytes
+  / node_memory_MemTotal_bytes
+)
+```
+
+Disk utilization:
+
+```promql
+100 * (
+  1 -
+  node_filesystem_avail_bytes{
+    mountpoint="/",
+    fstype!~"tmpfs|overlay"
+  }
+  /
+  node_filesystem_size_bytes{
+    mountpoint="/",
+    fstype!~"tmpfs|overlay"
+  }
+)
+```
+
+### Sample Prometheus Alert Rule:
+
+```yaml
+groups:
+  - name: infrastructure-alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: |
+          100 * (1 - avg by(instance) (
+            rate(node_cpu_seconds_total{mode="idle"}[5m])
+          )) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 85% for 5 minutes."
+```
+
+### Practice Questions:
+
+1. What is Prometheus?
+2. What is Node Exporter?
+3. What is PromQL?
+4. What is the role of Grafana?
+5. What is Alertmanager?
+6. What is the difference between metrics, logs, and traces?
+7. How do you reduce alert noise in production?
+
+---
+
+## 5. Application Troubleshooting – HTTP Errors and Latency
+
+### Objective:
+Understand common application errors and investigate production application failures.
+
+### Common HTTP Status Codes:
+
+| Status code | Meaning | Common cause |
+|---|---|---|
+| 500 | Internal Server Error | Application exception |
+| 502 | Bad Gateway | Invalid response from upstream |
+| 503 | Service Unavailable | Service overloaded or unavailable |
+| 504 | Gateway Timeout | Upstream response timeout |
+
+### Useful Commands:
+
+Check application endpoint:
+
+```bash
+curl -I http://localhost:8080
+```
+
+Check detailed response:
+
+```bash
+curl -v http://localhost:8080
+```
+
+Check application process:
+
+```bash
+ps -ef | grep java
+```
+
+Check listening port:
+
+```bash
+sudo ss -tulnp | grep 8080
+```
+
+Follow application logs:
+
+```bash
+tail -f /var/log/application.log
+```
+
+Search for errors:
+
+```bash
+grep -i "error" /var/log/application.log | tail -50
+```
+
+Search for timeout messages:
+
+```bash
+grep -i "timeout" /var/log/application.log | tail -50
+```
+
+### Application Troubleshooting Approach:
+
+1. Confirm the issue and affected service.
+2. Check application health endpoints.
+3. Review HTTP response codes.
+4. Analyze application logs.
+5. Check CPU, memory, and JVM utilization.
+6. Verify database connectivity.
+7. Check upstream and downstream dependencies.
+8. Review recent deployments or configuration changes.
+9. Mitigate the issue and validate service recovery.
+
+### Java and JVM Troubleshooting Concepts:
+
+Understand:
+
+- Heap memory.
+- Garbage Collection (GC).
+- OutOfMemoryError.
+- Thread dumps.
+- Heap dumps.
+- Thread pool exhaustion.
+- JVM CPU utilization.
+
+Useful commands:
+
+```bash
+jps -l
+jstat -gcutil <pid> 1000 5
+jcmd <pid> VM.flags
+```
+
+Use diagnostic commands carefully in production. Heap dumps and thread dumps can consume resources or contain sensitive application data.
+
+### Practice Questions:
+
+1. What is the difference between HTTP 500, 502, 503, and 504?
+2. How do you troubleshoot application downtime?
+3. What causes high response time?
+4. What is JVM heap memory?
+5. What is OutOfMemoryError?
+6. How do you troubleshoot database connection timeouts?
+
+---
+
+## 6. Kubernetes and Docker Production Troubleshooting
+
+### Objective:
+Practice troubleshooting Kubernetes workloads and container-related failures.
+
+### Basic Kubernetes Commands:
+
+Check nodes:
+
+```bash
+kubectl get nodes -o wide
+```
+
+Check pods:
+
+```bash
+kubectl get pods -A
+```
+
+Check deployments:
+
+```bash
+kubectl get deployments -A
+```
+
+Check services:
+
+```bash
+kubectl get services -A
+```
+
+Describe a pod:
+
+```bash
+kubectl describe pod <pod-name> -n <namespace>
+```
+
+Check pod logs:
+
+```bash
+kubectl logs <pod-name> -n <namespace>
+```
+
+Check previous container logs:
+
+```bash
+kubectl logs <pod-name> -n <namespace> --previous
+```
+
+Check resource utilization:
+
+```bash
+kubectl top nodes
+kubectl top pods -A
+```
+
+### Common Kubernetes Issues:
+
+**CrashLoopBackOff**
+
+- Check current and previous container logs.
+- Inspect pod events.
+- Verify application configuration.
+- Check liveness and readiness probes.
+- Investigate memory limits and application errors.
+
+**ImagePullBackOff**
+
+- Verify image name and tag.
+- Check registry connectivity.
+- Validate image pull secrets.
+- Confirm the image exists.
+
+**Pending Pods**
+
+- Check node capacity.
+- Review CPU and memory requests.
+- Inspect taints, tolerations, affinity, and scheduling events.
+
+**DNS Issues**
+
+- Verify CoreDNS pod health.
+- Check Kubernetes service configuration.
+- Validate DNS resolution from inside a test pod.
+- Review network policies and connectivity.
+
+### Docker Troubleshooting Commands:
+
+List running containers:
+
+```bash
+docker ps
+```
+
+View all containers:
+
+```bash
+docker ps -a
+```
+
+Check container logs:
+
+```bash
+docker logs <container-id>
+```
+
+Inspect container configuration:
+
+```bash
+docker inspect <container-id>
+```
+
+Check container resource utilization:
+
+```bash
+docker stats
+```
+
+### Practice Questions:
+
+1. How do you troubleshoot CrashLoopBackOff?
+2. What causes ImagePullBackOff?
+3. How do you troubleshoot Pending pods?
+4. What is the role of CoreDNS?
+5. How do you check container CPU and memory usage?
+6. What is the difference between readiness and liveness probes?
+
+---
+
+## 7. AWS Infrastructure and High Availability
+
+### Objective:
+Understand how cloud infrastructure supports application reliability and production availability.
+
+### Important AWS Services:
+
+- **EC2:** Virtual server infrastructure.
+- **VPC:** Network isolation and connectivity.
+- **Security Groups:** Instance-level network traffic controls.
+- **ALB:** Application load balancing at Layer 7.
+- **Auto Scaling Group:** Maintains desired EC2 instance capacity.
+- **CloudWatch:** Monitoring, metrics, logs, and alarms.
+- **Route 53:** DNS and traffic routing.
+- **EKS:** Managed Kubernetes service.
+
+### EC2 Troubleshooting:
+
+Check:
+
+1. Instance state and status checks.
+2. CPU and memory utilization.
+3. Security group rules.
+4. Network ACLs and route tables.
+5. Instance system logs.
+6. Application service status.
+7. Disk utilization and filesystem health.
+
+### High Availability Concepts:
+
+- Deploy across multiple Availability Zones.
+- Use load balancers to distribute traffic.
+- Configure health checks.
+- Use Auto Scaling for changing workloads.
+- Avoid single points of failure.
+- Test backup and recovery procedures.
+
+### Disaster Recovery Concepts:
+
+- RTO (Recovery Time Objective).
+- RPO (Recovery Point Objective).
+- Backup and restore.
+- Pilot light.
+- Warm standby.
+- Multi-site active/active.
+
+### Practice Questions:
+
+1. What is high availability?
+2. How does an ALB distribute traffic?
+3. What is an Auto Scaling Group?
+4. How do you troubleshoot an unhealthy EC2 instance?
+5. What is the difference between RTO and RPO?
+6. What is the purpose of deploying across multiple Availability Zones?
+
+---
+
+## 8. Automation Using Shell Scripting and Python
+
+### Objective:
+Automate repetitive SRE operational tasks and basic health checks.
+
+### Shell Script – Server Health Check
+
+Create a file:
+
+```bash
+vi health_check.sh
+```
+
+Add:
+
+```bash
+#!/bin/bash
+
+echo "===== SERVER HEALTH CHECK ====="
+
+echo "Hostname:"
+hostname
+
+echo "Date:"
+date
+
+echo "CPU Load:"
+uptime
+
+echo "Memory Usage:"
+free -h
+
+echo "Disk Usage:"
+df -h
+
+echo "Top CPU Processes:"
+ps aux --sort=-%cpu | head -6
+
+echo "Top Memory Processes:"
+ps aux --sort=-%mem | head -6
+
+echo "===== CHECK COMPLETED ====="
+```
+
+Give execution permission:
+
+```bash
+chmod +x health_check.sh
+```
+
+Run:
+
+```bash
+./health_check.sh
+```
+
+### Python Script – HTTP Health Check
+
+Create a file:
+
+```bash
+vi app_health_check.py
+```
+
+Add:
+
+```python
+import urllib.request
+import urllib.error
+
+url = "http://localhost:8080"
+
+try:
+    response = urllib.request.urlopen(url, timeout=5)
+
+    if response.status == 200:
+        print("Application is healthy")
+    else:
+        print("Application returned:", response.status)
+
+except urllib.error.HTTPError as error:
+    print("HTTP error:", error.code)
+
+except Exception as error:
+    print("Application health check failed:", error)
+```
+
+Run:
+
+```bash
+python3 app_health_check.py
+```
+
+### Automation Ideas:
+
+- Automated application health checks.
+- Disk utilization monitoring.
+- Log collection and filtering.
+- Service status validation.
+- Alert generation.
+- Daily operational reports.
+- Shift handover summaries.
+
+### Practice Questions:
+
+1. Why is automation important in SRE?
+2. What is toil reduction?
+3. How do you automate server health checks?
+4. How can Python help with production operations?
+5. What is the difference between Shell scripting and Python automation?
+
+---
+
+## 9. Incident Management, P1/P2 Handling, and RCA
+
+### Objective:
+Understand how to respond to production incidents and identify permanent corrective actions.
+
+### Incident Severity:
+
+| Priority | Typical impact |
+|---|---|
+| P1 | Critical production outage or major business impact |
+| P2 | Significant service degradation or partial outage |
+| P3 | Limited impact or non-critical functionality issue |
+| P4 | Low-impact issue or service request |
+
+Actual severity definitions depend on the organization's incident policy.
+
+### Incident Management Lifecycle:
+
+```text
+Alert Detection
+      |
+      v
+Incident Declaration
+      |
+      v
+Impact Assessment
+      |
+      v
+Incident Response
+      |
+      v
+Mitigation
+      |
+      v
+Service Recovery
+      |
+      v
+Root Cause Analysis
+      |
+      v
+Postmortem and Action Items
+```
+
+### Example P1 Scenario:
+
+**Scenario:** A production application becomes unavailable and users receive HTTP 503 errors.
+
+Response approach:
+
+1. Acknowledge the alert and confirm the impact.
+2. Check application and infrastructure health.
+3. Review load balancer target health.
+4. Check EC2 or Kubernetes workload availability.
+5. Review recent deployments and configuration changes.
+6. Engage application, infrastructure, and database teams as required.
+7. Apply an approved mitigation or rollback.
+8. Validate application recovery.
+9. Communicate updates to stakeholders.
+10. Prepare RCA and preventive action items.
+
+### Five Whys RCA Example:
+
+**Problem:** Application became unavailable.
+
+1. Why did the application become unavailable?  
+   Because application instances became unhealthy.
+
+2. Why did instances become unhealthy?  
+   Because memory utilization increased significantly.
+
+3. Why did memory utilization increase?  
+   Because application memory consumption increased after a deployment.
+
+4. Why was the memory issue not identified earlier?  
+   Because memory trend monitoring and alert thresholds were insufficient.
+
+5. Why were monitoring controls insufficient?  
+   Because the deployment validation process did not include appropriate memory-performance checks.
+
+**Corrective Actions:**
+
+- Review application memory behavior.
+- Improve memory monitoring and alert thresholds.
+- Add deployment performance validation.
+- Update operational runbooks.
+- Review rollback and release procedures.
+
+### Postmortem Best Practices:
+
+- Focus on facts and timelines.
+- Avoid blaming individuals.
+- Document customer and business impact.
+- Identify root and contributing causes.
+- Assign owners and due dates to corrective actions.
+- Track preventive actions until completion.
+
+### Practice Questions:
+
+1. How do you handle a P1 production incident?
+2. What is the difference between P1 and P2?
+3. What is Root Cause Analysis?
+4. Explain the Five Whys technique.
+5. What is a blameless postmortem?
+6. What information should an incident report contain?
+7. What is an on-call rotation?
+8. How do you manage incident escalation?
+
+---
+
+## 10. Capacity Planning, Change Management, and Alerting
+
+### Objective:
+Understand how SRE teams maintain stability during high traffic and production changes.
+
+### Capacity Planning:
+
+Capacity planning involves predicting future infrastructure requirements based on:
+
+- Historical traffic patterns.
+- CPU and memory utilization.
+- Request rate and response time.
+- Database connections.
+- Storage growth.
+- Seasonal and business traffic.
+- Expected application growth.
+
+### Change Freeze Concepts:
+
+**Hard Freeze:**
+- No routine production changes are permitted.
+- Common during critical business events or high-traffic periods.
+- Emergency changes follow a separate approval process.
+
+**Cold Freeze:**
+- Only approved critical or urgent changes are allowed.
+- Non-essential changes are postponed.
+
+These terms can vary by organization, so always follow the actual change-management policy.
+
+### Alerting Best Practices:
+
+- Configure meaningful thresholds.
+- Alert on user impact and service symptoms.
+- Avoid duplicate and noisy alerts.
+- Define severity and escalation paths.
+- Include useful troubleshooting information in alerts.
+- Review alert effectiveness regularly.
+
+### Practice Questions:
+
+1. What is capacity planning?
+2. Why do organizations implement change freezes?
+3. What is the difference between a hard freeze and a cold freeze?
+4. How do you reduce alert fatigue?
+5. Why should alerts be actionable?
+6. How do you prepare infrastructure for seasonal traffic?
+
+---
+
+## 11. Kafka and Distributed Application Troubleshooting
+
+### Objective:
+Understand basic Kafka monitoring and consumer lag troubleshooting.
+
+### Important Kafka Concepts:
+
+- Producer: Publishes messages.
+- Broker: Stores and serves messages.
+- Topic: Logical category for messages.
+- Partition: Divides topic data for scalability.
+- Consumer: Reads messages.
+- Consumer Group: Coordinates multiple consumers.
+- Consumer Lag: Difference between the latest available offset and the consumer's committed progress.
+
+### Common Consumer Lag Causes:
+
+- Slow message processing.
+- Insufficient consumer capacity.
+- Consumer application errors.
+- Broker or network issues.
+- Uneven partition distribution.
+- Downstream database or service bottlenecks.
+
+### Troubleshooting Approach:
+
+1. Check consumer group lag.
+2. Review consumer application logs.
+3. Check consumer health and processing rate.
+4. Inspect broker health and network connectivity.
+5. Review partition distribution.
+6. Check downstream dependencies.
+7. Scale or optimize consumers where appropriate.
+
+### Practice Questions:
+
+1. What is Kafka consumer lag?
+2. What causes consumer lag to increase?
+3. How do you troubleshoot a slow consumer?
+4. What is a Kafka partition?
+5. How can downstream database issues affect Kafka consumers?
+
+---
+
+## 12. Real-Time Production Troubleshooting Scenarios
+
+### Scenario 1: High CPU Utilization on an EC2 Instance
+
+Investigate:
+
+```bash
+top
+ps aux --sort=-%cpu | head -10
+uptime
+```
+
+Actions:
+
+- Identify the CPU-intensive process.
+- Check application logs.
+- Review recent deployments.
+- Investigate traffic spikes.
+- Check whether CPU utilization is sustained.
+- Scale or optimize after identifying the cause.
+
+### Scenario 2: Application Is Returning HTTP 502
+
+Investigate:
+
+- Load balancer target health.
+- Backend application availability.
+- Application listening port.
+- Security group connectivity.
+- Upstream connection failures.
+- Application and load balancer logs.
+
+### Scenario 3: Kubernetes Pod Is Restarting Frequently
+
+Investigate:
+
+```bash
+kubectl get pods -A
+kubectl describe pod <pod-name> -n <namespace>
+kubectl logs <pod-name> -n <namespace> --previous
+kubectl get events -n <namespace>
+```
+
+Actions:
+
+- Identify the container termination reason.
+- Check application errors.
+- Review memory and CPU limits.
+- Validate health probes.
+- Check recent configuration changes.
+
+### Scenario 4: Database Connection Timeout
+
+Investigate:
+
+- Database availability.
+- DNS resolution.
+- Network connectivity.
+- Security group and firewall rules.
+- Database connection limits.
+- Application connection pool settings.
+- Database logs and resource utilization.
+
+### Scenario 5: Disk Utilization Reaches 95%
+
+Investigate:
+
+```bash
+df -h
+df -i
+du -sh /var/log
+```
+
+Actions:
+
+- Identify large directories and files.
+- Check log rotation.
+- Review application log growth.
+- Follow approved retention and cleanup procedures.
+- Expand storage if required.
+- Confirm filesystem utilization after remediation.
+
+### Scenario 6: High API Response Time
+
+Investigate:
+
+- Request rate and error rate.
+- p95 and p99 latency.
+- Application CPU and memory.
+- JVM garbage collection.
+- Database query latency.
+- Downstream service response time.
+- Network latency.
+- Recent deployments.
+
+Use distributed tracing to identify where the request spends most of its time.
+
+---
+
+## 13. SRE Interview Questions – Production Support
+
+1. Explain SRE and its responsibilities.
+2. What are SLI, SLO, SLA, and Error Budget?
+3. How do you troubleshoot high CPU utilization?
+4. How do you troubleshoot high memory utilization?
+5. How do you investigate disk space issues?
+6. How do Prometheus and Grafana work together?
+7. What is Alertmanager?
+8. What is the difference between metrics, logs, and traces?
+9. How do you troubleshoot HTTP 500, 502, 503, and 504?
+10. How do you investigate application latency?
+11. How do you troubleshoot CrashLoopBackOff?
+12. How do you investigate an unhealthy EC2 instance?
+13. What is the difference between liveness and readiness probes?
+14. How do you troubleshoot database connectivity issues?
+15. What is Kafka consumer lag?
+16. Explain how you handle a P1 production incident.
+17. What is a blameless postmortem?
+18. How do you perform RCA using the Five Whys?
+19. What is toil, and how do you reduce it?
+20. How do you automate repetitive production tasks?
+21. What is capacity planning?
+22. Why do organizations implement production change freezes?
+23. How do you reduce alert fatigue?
+24. What is the difference between RTO and RPO?
+25. How do you ensure service availability during infrastructure maintenance?
+
+---
+
+## 14. Daily Completion Checklist
+
+- [ ] Understand SRE fundamentals.
+- [ ] Revise SLI, SLO, SLA, and Error Budget.
+- [ ] Understand toil and automation.
+- [ ] Practice Linux CPU and memory troubleshooting.
+- [ ] Practice disk and inode troubleshooting.
+- [ ] Review Linux network troubleshooting commands.
+- [ ] Understand Prometheus and Grafana architecture.
+- [ ] Practice PromQL basics and alert rules.
+- [ ] Review HTTP 500, 502, 503, and 504 troubleshooting.
+- [ ] Revise Java and JVM troubleshooting concepts.
+- [ ] Practice Kubernetes pod troubleshooting.
+- [ ] Review AWS EC2, ALB, and Auto Scaling concepts.
+- [ ] Write a Shell or Python health-check script.
+- [ ] Understand incident management and P1/P2 handling.
+- [ ] Practice Five Whys RCA.
+- [ ] Understand capacity planning and change freezes.
+- [ ] Review Kafka consumer lag.
+- [ ] Prepare production troubleshooting interview answers.
+
+## Important Notes
+
+1. SRE focuses on improving reliability, availability, performance, and operational efficiency.
+2. SLI measures reliability, SLO defines the target, and SLA represents a formal customer commitment.
+3. Error Budgets help teams make informed decisions about reliability and release velocity.
+4. Prometheus collects metrics, Grafana visualizes them, and Alertmanager manages alert notifications.
+5. Logs help investigate events, metrics show system behavior, and traces help identify request flow across services.
+6. During production incidents, prioritize impact assessment, communication, mitigation, and service recovery.
+7. Always investigate the root cause instead of applying temporary fixes repeatedly.
+8. Use blameless postmortems to improve systems and operational processes.
+9. Automate repetitive tasks to reduce toil and human error.
+10. Monitor both infrastructure health and user-facing application performance.
+11. Review recent deployments and configuration changes when investigating production failures.
+12. Follow approved change-management, escalation, and rollback procedures.
+13. Validate service recovery after every production remediation.
+14. Maintain accurate runbooks, incident reports, and corrective action trackers.

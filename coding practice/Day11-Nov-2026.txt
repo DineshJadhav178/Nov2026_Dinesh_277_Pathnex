@@ -1,0 +1,245 @@
+# Day 10 – AWS Cloud Engineering | Hands-on Coding Practice
+
+## 1. AWS CLI Installation and Configuration
+
+Check whether AWS CLI is installed:
+
+```bash
+aws --version
+```
+
+Configure AWS CLI:
+
+```bash
+aws configure
+```
+
+Provide the required credentials and default region when prompted.
+
+Verify AWS identity:
+
+```bash
+aws sts get-caller-identity
+```
+
+Check the configured region:
+
+```bash
+aws configure get region
+```
+
+**Practice tasks:**
+- Install AWS CLI on Ubuntu/WSL.
+- Configure credentials securely.
+- Verify AWS account identity.
+- Understand AWS CLI profiles.
+- Avoid hardcoding credentials in scripts or GitHub repositories.
+
+## 2. IAM – Identity and Access Management
+
+Practice IAM commands:
+
+```bash
+# List IAM users
+aws iam list-users
+
+# List IAM groups
+aws iam list-groups
+
+# List IAM roles
+aws iam list-roles
+
+# List managed policies
+aws iam list-policies --scope Local
+
+# Get current AWS identity
+aws sts get-caller-identity
+```
+
+**Practice tasks:**
+- Understand IAM users and groups.
+- Understand IAM roles and their purpose.
+- Explore AWS-managed and customer-managed policies.
+- Understand authentication versus authorization.
+- Learn the principle of least privilege.
+
+## 3. IAM Policy – Practical JSON Exercise
+
+Create a file:
+
+`ec2-readonly-policy.json`
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeImages",
+        "ec2:DescribeSecurityGroups"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+Validate the policy:
+
+```bash
+aws accessanalyzer validate-policy \
+  --policy-document file://ec2-readonly-policy.json \
+  --policy-type IDENTITY_POLICY
+```
+
+**Practice tasks:**
+- Understand the IAM policy structure.
+- Practice Allow and Deny effects.
+- Understand Action and Resource.
+- Learn how to restrict access to specific AWS services.
+- Understand why wildcard permissions should be avoided where possible.
+
+## 4. Understanding AWS ARN
+
+Practice identifying ARN components.
+
+Example:
+
+```text
+arn:aws:ec2:ap-south-1:123456789012:instance/i-1234567890abcdef0
+```
+
+Understand the components:
+
+- Partition: `aws`
+- Service: `ec2`
+- Region: `ap-south-1`
+- Account ID: `123456789012`
+- Resource: EC2 instance identifier
+
+**Practice tasks:**
+- Understand ARN structure.
+- Identify ARNs for IAM roles and policies.
+- Understand how ARNs are used in IAM permissions.
+
+## 5. EC2 – Instance Management
+
+List EC2 instances:
+
+```bash
+aws ec2 describe-instances \
+  --query "Reservations[].Instances[].[InstanceId,State.Name,InstanceType]" \
+  --output table
+```
+
+List available AMIs owned by Amazon:
+
+```bash
+aws ec2 describe-images \
+  --owners amazon \
+  --query "Images[].[ImageId,Name]" \
+  --output table
+```
+
+List security groups:
+
+```bash
+aws ec2 describe-security-groups \
+  --output table
+```
+
+List key pairs:
+
+```bash
+aws ec2 describe-key-pairs \
+  --output table
+```
+
+**Practice tasks:**
+- Understand EC2 instance lifecycle.
+- Explore AMIs and instance types.
+- Understand security groups.
+- Understand SSH key pairs.
+- Learn how to check instance status.
+
+## 6. AWS EC2 – Practical Project
+
+Perform the following through the AWS Management Console:
+
+1. Open the EC2 dashboard.
+2. Select Launch Instance.
+3. Choose an Amazon Linux AMI.
+4. Select an appropriate instance type.
+5. Configure a key pair.
+6. Configure a security group with restricted SSH access.
+7. Launch the EC2 instance.
+8. Verify instance health and status checks.
+9. Connect through SSH.
+10. Stop and terminate the instance after completing the exercise.
+
+**Important:** Check AWS pricing and Free Tier eligibility before launching resources. Terminate resources when finished to avoid unnecessary charges.
+
+## 7. AWS Governance and Configuration
+
+Explore the following AWS services:
+
+- AWS Control Tower – Multi-account governance.
+- AWS Organizations – Centralized account management.
+- AWS Config – Resource configuration tracking.
+- AWS CloudTrail – API activity and audit history.
+
+Practice tasks:
+
+1. Understand the purpose of AWS Organizations.
+2. Explore AWS Config configuration history.
+3. Understand compliance rules.
+4. Explore CloudTrail event history.
+5. Understand centralized AWS account governance.
+
+## 8. Real-Time AWS Troubleshooting Scenarios
+
+Practice answering these scenarios:
+
+1. An EC2 instance is running, but you cannot connect through SSH. How would you troubleshoot it?
+2. An IAM user receives an AccessDenied error. How would you investigate?
+3. An application cannot access an S3 bucket. What IAM permissions would you verify?
+4. An EC2 instance is showing a failed status check. How would you investigate?
+5. A developer requires read-only EC2 access. How would you create an IAM policy?
+6. How would you identify which IAM role is being used by an EC2 instance?
+7. How would you audit changes made to AWS resources?
+8. How would you manage multiple AWS accounts securely?
+
+## 9. AWS Interview Preparation
+
+Prepare short answers for:
+
+- What is cloud computing?
+- What is the difference between cloud and on-premises infrastructure?
+- Explain IaaS, PaaS and SaaS with examples.
+- What is AWS IAM?
+- What is the difference between authentication and authorization?
+- What are IAM users, groups and roles?
+- What is an IAM policy?
+- What is an ARN?
+- What is Amazon EC2?
+- What is an AMI?
+- What is AWS Control Tower?
+- What is AWS Config?
+- What is the difference between AWS Config and CloudTrail?
+
+## 10. Daily Completion Checklist
+
+- [ ] Installed and configured AWS CLI.
+- [ ] Verified AWS account using STS.
+- [ ] Practiced IAM users, groups and roles.
+- [ ] Created and validated a sample IAM JSON policy.
+- [ ] Understood ARN structure.
+- [ ] Explored EC2 instances and AMIs.
+- [ ] Practiced security group and key pair concepts.
+- [ ] Explored AWS Config and Control Tower.
+- [ ] Completed basic EC2 hands-on practice.
+- [ ] Practiced AWS troubleshooting and interview scenarios.
+
+**Important:** Use a non-production AWS account for hands-on exercises. Never commit AWS access keys, secret keys or other credentials to GitHub. Prefer IAM roles and temporary credentials wherever possible.

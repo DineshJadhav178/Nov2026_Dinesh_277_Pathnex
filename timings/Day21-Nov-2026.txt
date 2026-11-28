@@ -1,0 +1,55 @@
+# Day 21 – End-to-End DevOps Workflow
+
+## What I did today:
+
+**Hour 1: Infrastructure as Code with Terraform**
+- Learned how Terraform is used to provision and manage cloud infrastructure.
+- Understood the importance of Infrastructure as Code (IaC).
+- Learned why manual infrastructure changes should be avoided.
+- Reviewed the Terraform workflow: `init`, `plan`, `apply`, and `destroy`.
+- Understood how Terraform helps maintain consistent infrastructure across environments.
+
+**Hour 2: Continuous Deployment using ArgoCD**
+- Learned how ArgoCD connects a GitHub repository with a Kubernetes cluster.
+- Understood GitOps and the concept of Git as the source of truth.
+- Reviewed how ArgoCD continuously monitors Git repository changes.
+- Learned the difference between application synchronization and health status.
+- Understood automatic synchronization and self-healing.
+
+**Hour 3: Kubernetes Deployment and Troubleshooting**
+- Practiced Kubernetes application deployment concepts.
+- Learned how to investigate Pending pods and scheduling failures.
+- Reviewed commands such as `kubectl get pods`, `kubectl describe pod`, and `kubectl get nodes`.
+- Understood how insufficient CPU, memory, or available nodes can prevent pod scheduling.
+- Learned how to identify the root cause from pod events.
+
+**Hour 4: Kubernetes Cluster Autoscaler**
+- Learned why Cluster Autoscaler is required in Kubernetes.
+- Understood how it detects unschedulable pods and adjusts the number of worker nodes.
+- Reviewed IAM roles, policies, and Kubernetes service accounts.
+- Understood the relationship between Cluster Autoscaler and AWS Auto Scaling Groups.
+- Learned how dynamic node scaling helps handle changing application workloads.
+
+**Hour 5: New Relic Observability Integration**
+- Learned the purpose of New Relic in Kubernetes monitoring.
+- Understood how infrastructure agents and application instrumentation collect telemetry.
+- Reviewed metrics, logs, and distributed traces.
+- Learned how dashboards help monitor cluster health and application performance.
+- Understood the importance of monitoring CPU, memory, pod status, and application response times.
+
+**Hour 6: End-to-End Workflow Review**
+- Connected the complete workflow: Terraform → Kubernetes → ArgoCD → Cluster Autoscaler → New Relic.
+- Reviewed how infrastructure provisioning and GitOps deployment work together.
+- Understood how monitoring helps identify application and infrastructure issues.
+- Revised troubleshooting scenarios involving Pending pods and insufficient cluster capacity.
+- Documented key commands and interview questions.
+
+## Tomorrow's Tasks:
+
+1. Practice Terraform commands and understand the infrastructure provisioning workflow.
+2. Create a sample Kubernetes Deployment and Service using YAML.
+3. Connect a Git repository to ArgoCD in a safe lab environment.
+4. Practice ArgoCD synchronization, health checks, and self-healing.
+5. Understand Cluster Autoscaler architecture and AWS IAM permissions.
+6. Explore New Relic Kubernetes monitoring dashboards.
+7. Prepare an end-to-end explanation of how an application moves from infrastructure provisioning to deployment and monitoring.
