@@ -1,0 +1,640 @@
+# Day 12 – AWS Hands-on Practice | KMS, Databases, ETL, CI/CD & Observability
+
+## 1. AWS KMS – Key Management Service
+
+### Understand Encryption Fundamentals
+
+Learn the following concepts:
+
+- Symmetric encryption.
+- Asymmetric encryption.
+- Public and private keys.
+- Encryption and decryption.
+- HTTPS and TLS handshake.
+- AWS Key Management Service (KMS).
+- Customer managed keys.
+- AWS managed keys.
+- Key administrators.
+- Key users.
+- Key policies.
+- Key rotation.
+
+### Important Concepts
+
+**Symmetric Encryption:**
+
+Uses the same secret key for encryption and decryption.
+
+**Asymmetric Encryption:**
+
+Uses a public/private key pair for cryptographic operations.
+
+**AWS KMS:**
+
+Helps create and manage cryptographic keys used to protect data across AWS services.
+
+### Practical Tasks
+
+1. Open the AWS KMS console.
+2. Explore existing AWS managed keys.
+3. Create a customer managed symmetric encryption key.
+4. Configure key administrators.
+5. Configure key users.
+6. Explore the key policy.
+7. Understand key rotation options.
+8. Explore how KMS integrates with S3 and other AWS services.
+9. Understand key deletion scheduling and cancellation.
+
+### AWS CLI Practice
+
+```bash
+# List KMS keys
+aws kms list-keys
+
+# Describe a KMS key
+aws kms describe-key \
+  --key-id <key-id>
+
+# List aliases
+aws kms list-aliases
+
+# List key policies
+aws kms list-key-policies \
+  --key-id <key-id>
+
+# Generate a data key
+aws kms generate-data-key \
+  --key-id <key-id> \
+  --key-spec AES_256
+```
+
+### Practice Scenarios
+
+1. What is the difference between symmetric and asymmetric encryption?
+2. What is AWS KMS?
+3. What is the difference between AWS managed keys and customer managed keys?
+4. What is the purpose of a KMS key policy?
+5. What is the difference between a key administrator and a key user?
+6. How does S3 use KMS for encryption?
+
+## 2. AWS Database Services
+
+### A. Amazon RDS and Aurora
+
+Understand:
+
+- Relational databases.
+- SQL databases.
+- Amazon RDS.
+- Amazon Aurora.
+- MySQL and PostgreSQL compatibility.
+- Multi-AZ deployments.
+- Automated backups.
+- Read replicas.
+- Database endpoints.
+- Aurora Serverless.
+
+### Practical Tasks
+
+1. Open the Amazon RDS console.
+2. Explore available database engines.
+3. Understand DB instance classes.
+4. Explore storage configurations.
+5. Understand Multi-AZ deployment.
+6. Explore automated backups.
+7. Understand database endpoints.
+8. Explore Aurora clusters and instances.
+9. Understand Aurora Serverless concepts.
+10. Review database connectivity and Security Group requirements.
+
+### Database Connectivity Commands
+
+```bash
+# Check connectivity to a database endpoint
+nc -zv <database-endpoint> 3306
+
+# PostgreSQL connectivity
+nc -zv <database-endpoint> 5432
+
+# Check DNS resolution
+nslookup <database-endpoint>
+
+# Check network connectivity
+ping <database-endpoint>
+```
+
+Note: ICMP ping may be blocked even when the database port is accessible. Use the appropriate database client to verify actual connectivity.
+
+### B. Amazon DynamoDB
+
+Understand:
+
+- NoSQL databases.
+- Key-value data model.
+- Document data model.
+- Partition keys.
+- Sort keys.
+- On-demand capacity.
+- Provisioned capacity.
+- Read and write capacity.
+- DynamoDB Streams.
+- Lambda integration.
+- Encryption at rest.
+
+### Practical Tasks
+
+1. Open the DynamoDB console.
+2. Create a test table.
+3. Configure a partition key.
+4. Optionally configure a sort key.
+5. Add sample items.
+6. Retrieve records.
+7. Update an existing item.
+8. Delete an item.
+9. Explore on-demand and provisioned capacity.
+10. Understand DynamoDB Streams.
+
+### AWS CLI Practice
+
+```bash
+# List DynamoDB tables
+aws dynamodb list-tables
+
+# Describe a table
+aws dynamodb describe-table \
+  --table-name my-table
+
+# Scan a table
+aws dynamodb scan \
+  --table-name my-table
+```
+
+### C. Amazon Redshift
+
+Understand:
+
+- Data warehousing.
+- Analytical databases.
+- OLAP concepts.
+- SQL analytics.
+- Data lakes.
+- Business intelligence.
+- Large-scale data processing.
+
+### Practice Tasks
+
+1. Explore Amazon Redshift.
+2. Understand provisioned clusters and serverless options.
+3. Understand data warehouse architecture.
+4. Explore how Redshift integrates with S3.
+5. Understand analytical queries versus transactional queries.
+
+### Important Database Comparison
+
+| Service | Purpose |
+|---|---|
+| Amazon RDS | Managed relational database |
+| Amazon Aurora | Managed relational database engine |
+| DynamoDB | Managed NoSQL database |
+| Amazon Redshift | Cloud data warehouse |
+
+### Practice Scenarios
+
+1. What is the difference between SQL and NoSQL?
+2. What is the difference between RDS and DynamoDB?
+3. What is Amazon Aurora?
+4. What is the difference between Multi-AZ and Read Replicas?
+5. What is the purpose of a partition key in DynamoDB?
+6. What is Amazon Redshift used for?
+
+## 3. AWS Batch – Batch Processing
+
+### Understand AWS Batch Fundamentals
+
+Learn:
+
+- Batch processing.
+- Compute environments.
+- Job queues.
+- Job definitions.
+- EC2-based compute.
+- Spot Instances.
+- AWS Fargate.
+- Container-based batch execution.
+- CPU and memory allocation.
+
+### Practical Tasks
+
+1. Open the AWS Batch console.
+2. Explore compute environments.
+3. Understand managed and unmanaged compute environments.
+4. Explore job queues.
+5. Understand job definitions.
+6. Explore container image configuration.
+7. Understand CPU and memory requirements.
+8. Learn how jobs move from queues to execution.
+9. Explore job status and logs.
+10. Understand retry strategies.
+
+### AWS Batch Workflow
+
+```text
+        Submit Job
+             |
+             v
+       Job Definition
+             |
+             v
+         Job Queue
+             |
+             v
+    Compute Environment
+             |
+             v
+      Container Execution
+             |
+             v
+       Job Completion
+```
+
+### Practice Scenarios
+
+1. What is AWS Batch?
+2. What is the difference between a job queue and a job definition?
+3. What is a compute environment?
+4. How does AWS Batch use Docker containers?
+5. When would you choose Fargate instead of EC2-based compute?
+
+## 4. AWS Glue – ETL Processing
+
+### Understand ETL Fundamentals
+
+ETL stands for:
+
+- Extract – Collect data from source systems.
+- Transform – Clean, filter and process data.
+- Load – Store processed data in a target system.
+
+### Understand AWS Glue
+
+Learn:
+
+- AWS Glue.
+- Glue Data Catalog.
+- Crawlers.
+- ETL Jobs.
+- Data transformation.
+- Apache Spark.
+- Data pipelines.
+- S3 integration.
+- Job monitoring.
+
+### Practical Tasks
+
+1. Open the AWS Glue console.
+2. Explore the Glue Data Catalog.
+3. Understand databases and tables.
+4. Explore Glue Crawlers.
+5. Understand ETL job configurations.
+6. Explore S3 as a data source.
+7. Understand transformed data storage.
+8. Explore job execution history.
+9. Understand CloudWatch Logs integration.
+
+### AWS Glue vs. Lambda
+
+| AWS Glue | AWS Lambda |
+|---|---|
+| Designed for ETL and data integration | Designed for event-driven compute |
+| Supports large-scale data processing | Suitable for short-running tasks |
+| Supports Spark-based processing | Supports multiple managed runtimes |
+| Suitable for complex data transformations | Maximum execution time of 15 minutes |
+
+### Practice Scenarios
+
+1. What is ETL?
+2. What is AWS Glue?
+3. What is the purpose of a Glue Crawler?
+4. What is the Glue Data Catalog?
+5. When would you use Glue instead of Lambda?
+
+## 5. AWS Elastic Beanstalk – Application Deployment
+
+### Understand Elastic Beanstalk
+
+Learn:
+
+- Platform-as-a-Service (PaaS).
+- Application deployment.
+- Application versions.
+- Environments.
+- Environment health.
+- Auto Scaling integration.
+- Load Balancer integration.
+- RDS integration.
+- Application monitoring.
+
+### Practical Tasks
+
+1. Open the Elastic Beanstalk console.
+2. Explore supported application platforms.
+3. Understand application and environment concepts.
+4. Explore sample application deployment.
+5. Understand environment health.
+6. Explore application logs.
+7. Understand underlying EC2 and Load Balancer resources.
+8. Explore application version management.
+9. Understand deployment policies.
+
+### Practice Scenarios
+
+1. What is AWS Elastic Beanstalk?
+2. What is the difference between EC2 and Elastic Beanstalk?
+3. How does Elastic Beanstalk manage infrastructure?
+4. How would you troubleshoot an unhealthy Elastic Beanstalk environment?
+5. How can you view application logs?
+
+## 6. Amazon CloudFront – Content Delivery Network
+
+### Understand CloudFront Fundamentals
+
+Learn:
+
+- Content Delivery Network (CDN).
+- Edge Locations.
+- Origin Servers.
+- Cache Behavior.
+- Cache Hit.
+- Cache Miss.
+- Time to Live (TTL).
+- Distribution.
+- Origin Access Control (OAC).
+- Cache Invalidation.
+
+### Practical Tasks
+
+1. Open Amazon CloudFront.
+2. Explore distributions.
+3. Understand origins.
+4. Explore S3 as an origin.
+5. Understand EC2 or ALB origins.
+6. Explore cache behaviors.
+7. Understand TTL settings.
+8. Explore cache invalidation.
+9. Understand HTTPS integration.
+10. Learn how CloudFront reduces requests to backend servers.
+
+### CloudFront Architecture
+
+```text
+       User Request
+             |
+             v
+       CloudFront CDN
+             |
+       +-----+-----+
+       |           |
+       v           v
+   Cache Hit   Cache Miss
+       |           |
+       v           v
+  Edge Cache     Origin
+       |           |
+       v           v
+  Return Data   Fetch Content
+                   |
+                   v
+              Update Cache
+                   |
+                   v
+              Return Data
+```
+
+### Practice Scenarios
+
+1. What is a CDN?
+2. What is an Edge Location?
+3. What is the difference between a cache hit and cache miss?
+4. How does CloudFront improve application performance?
+5. How can you serve private S3 content through CloudFront?
+6. What is cache invalidation?
+
+## 7. AWS Data Migration and Hybrid Connectivity
+
+### A. AWS Snowball
+
+Understand:
+
+- Physical data transfer.
+- Large-scale migration.
+- Offline data transfer.
+- Data transfer appliances.
+- Snowball use cases.
+
+### B. AWS DataSync
+
+Understand:
+
+- Online data migration.
+- Automated data transfer.
+- On-premises to AWS transfer.
+- S3 and EFS integration.
+- Transfer scheduling.
+- Data validation.
+
+### C. AWS Direct Connect
+
+Understand:
+
+- Dedicated network connection.
+- On-premises connectivity.
+- AWS hybrid cloud.
+- Virtual interfaces.
+- Private connectivity.
+- Network bandwidth and latency.
+
+### Important Comparison
+
+| Service | Primary Purpose |
+|---|---|
+| AWS Snowball | Physical bulk data transfer |
+| AWS DataSync | Automated online data transfer |
+| AWS Direct Connect | Dedicated hybrid network connectivity |
+
+### Practice Scenarios
+
+1. How would you migrate several terabytes of data to AWS?
+2. What is the difference between Snowball and DataSync?
+3. What is AWS Direct Connect?
+4. When would you use Direct Connect instead of a VPN?
+5. How would you design hybrid connectivity between an on-premises data center and AWS?
+
+## 8. AWS CI/CD Developer Tools
+
+### Understand AWS Developer Tools
+
+Learn:
+
+- AWS CodePipeline.
+- AWS CodeBuild.
+- AWS CodeDeploy.
+- Source integration.
+- Build automation.
+- Deployment automation.
+- Deployment strategies.
+- Pipeline stages.
+- Artifact management.
+
+### A. AWS CodePipeline
+
+Understand:
+
+- Pipeline stages.
+- Source stage.
+- Build stage.
+- Test stage.
+- Deploy stage.
+- Approval actions.
+- Artifact flow.
+
+### B. AWS CodeBuild
+
+Understand:
+
+- Managed build service.
+- Build environments.
+- Build specifications.
+- Dependency installation.
+- Build execution.
+- Test execution.
+- Artifact generation.
+
+### Example buildspec.yml
+
+```yaml
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing dependencies
+
+  build:
+    commands:
+      - echo Building application
+
+  post_build:
+    commands:
+      - echo Build completed successfully
+
+artifacts:
+  files:
+    - '**/*'
+```
+
+### C. AWS CodeDeploy
+
+Understand:
+
+- Application revisions.
+- Deployment groups.
+- Deployment configurations.
+- Rolling deployment.
+- Blue-green deployment.
+- Canary deployment.
+- Deployment monitoring.
+- Rollback concepts.
+
+### Important Comparison
+
+| AWS Service | Responsibility |
+|---|---|
+| CodePipeline | Orchestrates CI/CD workflow |
+| CodeBuild | Builds and tests application code |
+| CodeDeploy | Automates application deployment |
+
+### Practical Tasks
+
+1. Explore AWS CodePipeline.
+2. Understand source, build and deploy stages.
+3. Explore CodeBuild projects.
+4. Understand buildspec.yml.
+5. Explore CodeDeploy applications and deployment groups.
+6. Understand EC2 and supported compute deployment targets.
+7. Compare rolling and blue-green deployment.
+8. Understand canary deployment.
+9. Explore deployment status and failure logs.
+10. Understand deployment rollback.
+
+### Practice Scenarios
+
+1. What is the difference between CodePipeline and CodeBuild?
+2. What is the purpose of buildspec.yml?
+3. How does CodeDeploy work?
+4. What is the difference between rolling and blue-green deployment?
+5. How would you troubleshoot a failed CodeBuild stage?
+6. How would you investigate an unsuccessful application deployment?
+
+## 9. AWS X-Ray – Distributed Tracing
+
+### Understand X-Ray Fundamentals
+
+Learn:
+
+- Distributed tracing.
+- Trace IDs.
+- Segments.
+- Subsegments.
+- Service maps.
+- Request latency.
+- Performance bottlenecks.
+- Microservices monitoring.
+- Error and fault analysis.
+
+### Practical Tasks
+
+1. Open the AWS X-Ray console.
+2. Explore traces and service maps.
+3. Understand trace IDs.
+4. Explore segments and subsegments.
+5. Understand request latency.
+6. Identify services contributing to response delays.
+7. Explore errors and faults.
+8. Understand how distributed tracing helps troubleshoot microservices.
+
+### Example Microservices Architecture
+
+```text
+       Client Request
+             |
+             v
+       API Gateway
+             |
+             v
+       Application
+             |
+       +-----+-----+
+       |           |
+       v           v
+    Service A   Service B
+       |           |
+       v           v
+    Database    Database
+       |           |
+       +-----+-----+
+             |
+             v
+       AWS X-Ray
+     Distributed Trace
+```
+
+### Practice Scenarios
+
+1. What is distributed tracing?
+2. What is AWS X-Ray?
+3. What is the difference between metrics, logs and traces?
+4. How would you identify a slow microservice?
+5. How do traces help identify database latency?
+6. What is a service map?
+
+## 10. Real-Time AWS SRE/DevOps
