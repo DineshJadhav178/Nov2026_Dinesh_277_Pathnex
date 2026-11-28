@@ -1,0 +1,56 @@
+# Day 19 – End-to-End DevSecOps (Security in CI/CD Pipeline)
+
+## What I did today:
+
+1. **DevSecOps Fundamentals and SDLC (1 Hour)**
+   - Studied the concept of DevSecOps and its importance in modern software delivery.
+   - Understood how security practices are integrated throughout the Software Development Lifecycle (SDLC).
+   - Learned the difference between traditional DevOps and DevSecOps.
+   - Understood that security is a shared responsibility across development, operations, and security teams.
+   - Reviewed the stages of a secure CI/CD pipeline, from coding to production monitoring.
+
+2. **Shift-Left Security Approach (1 Hour)**
+   - Learned the concept of Shift-Left Security and why security testing should start early in development.
+   - Understood how early vulnerability detection reduces remediation costs and production risks.
+   - Studied security checks during coding, code commits, pull requests, and build stages.
+   - Explored how automated security checks can be integrated into developer workflows.
+   - Understood the importance of fixing security issues before application deployment.
+
+3. **SAST and Static Code Analysis (1 Hour)**
+   - Studied Static Application Security Testing (SAST).
+   - Understood how SAST tools analyze source code without executing the application.
+   - Explored SonarQube and Semgrep for identifying vulnerabilities, bugs, and code quality issues.
+   - Learned how security quality gates can prevent code with critical issues from progressing through the pipeline.
+   - Understood the importance of reviewing and remediating findings.
+
+4. **Software Composition Analysis – SCA (1 Hour)**
+   - Studied Software Composition Analysis and its role in identifying vulnerable third-party dependencies.
+   - Understood the risks associated with outdated open-source libraries and components.
+   - Explored dependency vulnerability scanning and Software Bill of Materials (SBOM) concepts.
+   - Reviewed examples of vulnerable dependencies, including the Log4j vulnerability.
+   - Learned how SCA tools help identify known vulnerabilities and license-related risks.
+
+5. **Container and Infrastructure Security (1 Hour)**
+   - Studied Docker image security and container vulnerability scanning.
+   - Understood how to identify outdated packages, vulnerable base images, and misconfigurations.
+   - Explored Terraform security scanning for infrastructure-as-code configurations.
+   - Learned the importance of checking IAM permissions, network exposure, encryption, and infrastructure settings.
+   - Reviewed tools and concepts such as Trivy, Checkov, and container security best practices.
+
+6. **Runtime Security and DevSecOps Pipeline Integration (1 Hour)**
+   - Studied runtime security monitoring using Falco.
+   - Understood how runtime security tools detect suspicious container and system activities.
+   - Reviewed how security scans can be integrated into Jenkins or GitLab CI/CD pipelines.
+   - Learned the importance of automated security gates, vulnerability prioritization, and continuous monitoring.
+   - Revised the end-to-end DevSecOps workflow from code commit to production deployment.
+
+## Tomorrow's Tasks:
+
+1. Understand the complete DevSecOps CI/CD pipeline architecture.
+2. Practice source code scanning using Semgrep or SonarQube.
+3. Explore dependency vulnerability scanning using Trivy.
+4. Practice Docker image security scanning.
+5. Scan Terraform files for security misconfigurations using Checkov.
+6. Understand how security checks can be added to a GitLab CI/CD pipeline.
+7. Study Falco runtime security concepts.
+8. Prepare DevSecOps and security-scanning interview questions.

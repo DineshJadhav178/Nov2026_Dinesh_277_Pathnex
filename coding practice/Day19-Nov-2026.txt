@@ -1,0 +1,676 @@
+# Day 19 – End-to-End DevSecOps | Hands-on Practice
+
+## 1. DevSecOps Fundamentals and Pipeline Architecture
+
+### Objective:
+Understand how security is integrated into every stage of the software development lifecycle.
+
+### Traditional DevOps Pipeline:
+
+```text
+Developer
+    |
+    v
+Source Code
+    |
+    v
+Build
+    |
+    v
+Test
+    |
+    v
+Deploy
+    |
+    v
+Production
+```
+
+### DevSecOps Pipeline:
+
+```text
+Developer
+    |
+    v
+Code Commit
+    |
+    v
+SAST Scanning
+    |
+    v
+SCA / Dependency Scanning
+    |
+    v
+Build Application
+    |
+    v
+Container Image Scanning
+    |
+    v
+Infrastructure Security Scan
+    |
+    v
+Approval / Security Gate
+    |
+    v
+Deploy to Environment
+    |
+    v
+Runtime Security Monitoring
+```
+
+### Important Concepts:
+
+- **DevOps:** Combines development and operations practices to improve software delivery.
+- **DevSecOps:** Integrates security into the complete DevOps lifecycle.
+- **Shift-Left Security:** Moves security checks earlier in the development process.
+- **Security Gate:** A pipeline condition that controls whether a build or deployment can proceed.
+- **Continuous Monitoring:** Monitors applications and infrastructure for security issues after deployment.
+
+### Practice Questions:
+
+1. What is DevSecOps?
+2. What is the difference between DevOps and DevSecOps?
+3. What is Shift-Left Security?
+4. Why should security testing happen early in the SDLC?
+5. What is a security gate in a CI/CD pipeline?
+
+---
+
+## 2. SAST – Static Application Security Testing
+
+### Objective:
+Understand how source code is scanned for security vulnerabilities without executing the application.
+
+### Common SAST Tools:
+
+- SonarQube
+- Semgrep
+- Checkmarx
+- Fortify
+
+### Practice Using Semgrep
+
+Install Semgrep in a Python virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install semgrep
+```
+
+Check the installed version:
+
+```bash
+semgrep --version
+```
+
+Create a sample Python file:
+
+```bash
+mkdir devsecops-practice
+cd devsecops-practice
+
+vi app.py
+```
+
+Add sample code:
+
+```python
+import subprocess
+
+user_input = input("Enter command: ")
+
+subprocess.run(user_input, shell=True)
+```
+
+Run a Semgrep scan:
+
+```bash
+semgrep scan --config auto app.py
+```
+
+### What to Observe:
+
+- Identify potential security issues.
+- Review the rule that triggered the finding.
+- Understand why executing untrusted user input through a shell is dangerous.
+- Review the suggested remediation.
+- Modify the code to use safer input handling and avoid shell execution.
+
+### Example of Safer Command Execution:
+
+```python
+import subprocess
+
+user_input = input("Enter filename: ")
+
+subprocess.run(
+    ["ls", "-l", "--", user_input],
+    check=True
+)
+```
+
+This example avoids passing the user input through a shell. Production applications should still validate inputs according to their requirements.
+
+### SonarQube Concepts:
+
+Understand the following:
+
+- Bugs
+- Vulnerabilities
+- Code Smells
+- Security Hotspots
+- Quality Gates
+- Code Coverage
+
+### Practice Questions:
+
+1. What is SAST?
+2. Does SAST require application execution?
+3. What is the difference between SAST and DAST?
+4. What is SonarQube?
+5. What is a Quality Gate?
+6. How can SAST be integrated into Jenkins or GitLab CI/CD?
+
+---
+
+## 3. SCA – Software Composition Analysis
+
+### Objective:
+Understand how third-party libraries and open-source dependencies are scanned for known vulnerabilities.
+
+### Why SCA Is Required:
+
+Modern applications depend on external libraries and packages.
+
+For example:
+
+```text
+Application
+    |
+    |-- Python Libraries
+    |
+    |-- Java Dependencies
+    |
+    |-- Node.js Packages
+    |
+    |-- Open-source Components
+```
+
+An outdated or vulnerable dependency can introduce security risks even when the application code itself is secure.
+
+### Important Concepts:
+
+- Dependency scanning
+- Known vulnerabilities
+- CVE (Common Vulnerabilities and Exposures)
+- CVSS (Common Vulnerability Scoring System)
+- Software Bill of Materials (SBOM)
+- Dependency updates and remediation
+
+### Practice Using Trivy
+
+Install Trivy according to the official installation instructions for your operating system.
+
+Check the version:
+
+```bash
+trivy --version
+```
+
+Create a sample requirements file:
+
+```text
+requests
+flask
+```
+
+Scan the dependency file:
+
+```bash
+trivy fs --scanners vuln .
+```
+
+Review the output for:
+
+- Vulnerable packages
+- CVE identifiers
+- Severity levels
+- Installed package versions
+- Fixed versions, where available
+
+### Generate an SBOM:
+
+```bash
+trivy fs --format cyclonedx \
+  --output sbom.json .
+```
+
+### Practice Questions:
+
+1. What is SCA?
+2. What is the difference between SAST and SCA?
+3. What is a CVE?
+4. What is CVSS?
+5. What is an SBOM?
+6. How would you handle a critical vulnerability in a third-party dependency?
+7. Why is dependency version management important?
+
+---
+
+## 4. Docker and Container Security
+
+### Objective:
+Understand how to identify security vulnerabilities in Docker images.
+
+### Important Container Security Risks:
+
+- Vulnerable operating system packages.
+- Outdated base images.
+- Running containers as root unnecessarily.
+- Exposing unnecessary ports.
+- Hardcoding passwords or API keys in Dockerfiles.
+- Using untrusted container images.
+- Giving containers excessive privileges.
+
+### Sample Dockerfile:
+
+```dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+USER 10001
+
+CMD ["python", "app.py"]
+```
+
+### Important Best Practices:
+
+1. Prefer trusted and maintained base images.
+2. Use minimal base images where appropriate.
+3. Avoid storing credentials in Dockerfiles.
+4. Run applications as non-root users where possible.
+5. Scan images before deployment.
+6. Keep dependencies and base images updated.
+7. Avoid privileged containers unless there is a justified requirement.
+
+### Practice Using Trivy:
+
+Build a sample Docker image:
+
+```bash
+docker build -t devsecops-demo:v1 .
+```
+
+Scan the image:
+
+```bash
+trivy image devsecops-demo:v1
+```
+
+Scan for selected severity levels:
+
+```bash
+trivy image --severity HIGH,CRITICAL devsecops-demo:v1
+```
+
+### Practice Questions:
+
+1. What is container security?
+2. Why should containers avoid running as root?
+3. How do you scan Docker images for vulnerabilities?
+4. What is the difference between image scanning and runtime security?
+5. How do you handle a critical vulnerability in a base image?
+
+---
+
+## 5. Terraform and Infrastructure Security
+
+### Objective:
+Understand how Infrastructure as Code can be scanned for security misconfigurations before provisioning cloud resources.
+
+### Common Infrastructure Security Risks:
+
+- Publicly exposed storage buckets.
+- Overly permissive security groups.
+- Unrestricted inbound access.
+- IAM policies with excessive permissions.
+- Unencrypted storage.
+- Missing logging and monitoring configurations.
+
+### Sample Terraform Configuration:
+
+```hcl
+resource "aws_security_group" "example" {
+  name        = "example-security-group"
+  description = "Security group for DevSecOps practice"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description = "SSH access"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+
+**Security observation:** This configuration exposes SSH to all IPv4 addresses. Avoid this in production. Restrict SSH access to approved source networks or use a managed access method such as AWS Systems Manager Session Manager.
+
+### Practice Using Checkov:
+
+Install Checkov:
+
+```bash
+pip install checkov
+```
+
+Check the version:
+
+```bash
+checkov --version
+```
+
+Scan Terraform files:
+
+```bash
+checkov -d .
+```
+
+Review:
+
+- Failed security checks.
+- Resource misconfigurations.
+- Risk descriptions.
+- Recommended remediation.
+
+### Practice Questions:
+
+1. What is Infrastructure as Code security?
+2. Why should Terraform files be scanned before deployment?
+3. What is Checkov?
+4. How do you identify publicly exposed AWS resources?
+5. Why should IAM policies follow least privilege?
+6. How can security scanning be integrated into Terraform pipelines?
+
+---
+
+## 6. Runtime Security Monitoring Using Falco
+
+### Objective:
+Understand how runtime security tools detect suspicious activity in containers and Kubernetes environments.
+
+### What Is Falco?
+
+Falco is a runtime security tool that monitors system and container activity and generates alerts when configured security rules detect suspicious behavior.
+
+### Example Security Events:
+
+- Unexpected shell execution inside a container.
+- Suspicious process activity.
+- Unexpected access to sensitive files.
+- Unusual privilege escalation behavior.
+- Unexpected network activity.
+
+### Understand the Runtime Security Flow:
+
+```text
+Kubernetes / Container Workload
+             |
+             v
+        Runtime Events
+             |
+             v
+            Falco
+             |
+             v
+       Security Rules
+             |
+             v
+         Alert Event
+             |
+             v
+    Security / SRE Team
+```
+
+### Important Concepts:
+
+- Runtime threat detection.
+- Falco rules.
+- Container activity monitoring.
+- Security alerts.
+- Incident investigation.
+- Kubernetes runtime security.
+
+### Practice Questions:
+
+1. What is Falco?
+2. What is runtime security?
+3. What is the difference between image scanning and runtime monitoring?
+4. How can Falco help detect suspicious activity in Kubernetes?
+5. What should an SRE team do after receiving a runtime security alert?
+
+---
+
+## 7. CI/CD Pipeline Security Integration
+
+### Objective:
+Understand how security tools can be integrated into a CI/CD pipeline using automated stages and security gates.
+
+### Example GitLab CI/CD Pipeline:
+
+```yaml
+stages:
+  - security_scan
+  - build
+  - image_scan
+  - deploy
+
+sast_scan:
+  stage: security_scan
+  image: returntocorp/semgrep
+  script:
+    - semgrep scan --config auto .
+  allow_failure: false
+
+dependency_scan:
+  stage: security_scan
+  image: aquasec/trivy:latest
+  script:
+    - trivy fs --scanners vuln --exit-code 1 --severity HIGH,CRITICAL .
+  allow_failure: false
+
+build_image:
+  stage: build
+  script:
+    - docker build -t my-app:$CI_COMMIT_SHORT_SHA .
+
+container_scan:
+  stage: image_scan
+  script:
+    - trivy image --exit-code 1 --severity HIGH,CRITICAL my-app:$CI_COMMIT_SHORT_SHA
+
+deploy_application:
+  stage: deploy
+  script:
+    - echo "Deploy application after successful security checks"
+  when: manual
+```
+
+**Important:** This is an illustrative pipeline. Configure the required GitLab runners, container build environment, image registry, tool versions, and credentials before executing it. In production, pin tool images to approved versions or digests, and configure scanning policies according to organizational risk requirements.
+
+### Security Gate Concept:
+
+A security gate controls whether the pipeline can continue.
+
+Example:
+
+```text
+Code Commit
+    |
+    v
+SAST Scan
+    |
+    v
+SCA Scan
+    |
+    v
+Build Image
+    |
+    v
+Container Scan
+    |
+    v
+Security Gate
+    |
+    +---- Critical Finding ----> Fail Pipeline
+    |
+    +---- Policy Passed -------> Continue Deployment
+```
+
+### Important Concepts:
+
+- Automated scanning.
+- Pipeline stages.
+- Security quality gates.
+- Vulnerability severity.
+- Build failure conditions.
+- Manual production approvals.
+- Security reports and audit trails.
+
+### Practice Questions:
+
+1. How do you integrate security scanning into GitLab CI/CD?
+2. At which stage should SAST scanning happen?
+3. Why should dependency scanning happen before deployment?
+4. How can a pipeline fail when critical vulnerabilities are detected?
+5. What is the difference between a security gate and a manual approval?
+6. How do you handle false-positive security findings?
+
+---
+
+## 8. DevSecOps Troubleshooting Scenarios – SRE Perspective
+
+### Scenario 1: SAST Scan Fails in the Pipeline.
+
+Investigate:
+
+1. Review the pipeline job logs.
+2. Identify the file and line containing the finding.
+3. Review the security rule and severity.
+4. Confirm whether the finding is a genuine vulnerability.
+5. Fix the code or follow the approved exception process.
+6. Rerun the scan and verify the result.
+
+### Scenario 2: Critical Dependency Vulnerability Is Detected.
+
+Investigate:
+
+1. Identify the affected dependency.
+2. Check the CVE and severity.
+3. Review the affected package version.
+4. Check whether a fixed version is available.
+5. Upgrade the dependency after compatibility testing.
+6. Rerun SCA scanning.
+7. Document any accepted residual risk.
+
+### Scenario 3: Docker Image Scan Reports Critical Vulnerabilities.
+
+Investigate:
+
+1. Identify the affected operating system package or application dependency.
+2. Review the base image and package versions.
+3. Update the base image or vulnerable package.
+4. Rebuild the Docker image.
+5. Rerun the image scan.
+6. Deploy only after the applicable security policy is satisfied.
+
+### Scenario 4: Terraform Security Scan Fails.
+
+Investigate:
+
+1. Identify the affected Terraform resource.
+2. Review the failed Checkov rule.
+3. Understand the risk and resource exposure.
+4. Correct the Terraform configuration.
+5. Rerun the security scan.
+6. Review the plan before applying infrastructure changes.
+
+### Scenario 5: Falco Generates a Suspicious Runtime Alert.
+
+Investigate:
+
+1. Identify the affected Kubernetes pod and namespace.
+2. Review the alert timestamp and rule.
+3. Check the process and container activity.
+4. Review pod logs and related events.
+5. Escalate according to the security incident process.
+6. Contain the affected workload when authorized.
+7. Preserve evidence and follow the incident response procedure.
+
+---
+
+## 9. SRE Interview Questions – DevSecOps
+
+1. What is DevSecOps?
+2. Explain the end-to-end DevSecOps pipeline.
+3. What is Shift-Left Security?
+4. What is SAST?
+5. What is SCA?
+6. What is the difference between SAST, DAST, and SCA?
+7. What is SonarQube, and how is it used in CI/CD?
+8. What is Semgrep?
+9. What is a CVE and how is it used in vulnerability management?
+10. What is an SBOM?
+11. How do you scan Docker images for vulnerabilities?
+12. What is Terraform security scanning?
+13. What is Checkov?
+14. What is Falco, and how does it help with runtime security?
+15. How do you configure a security gate in Jenkins or GitLab?
+16. What would you do if a critical vulnerability was detected during a production deployment?
+17. How do you manage false positives in security scanning?
+18. How do you prioritize vulnerabilities based on risk?
+19. How do you secure credentials in CI/CD pipelines?
+20. How does DevSecOps improve production reliability and security?
+
+---
+
+## 10. Daily Completion Checklist
+
+- [ ] Understand DevSecOps and SDLC.
+- [ ] Understand Shift-Left Security.
+- [ ] Learn the purpose of SAST.
+- [ ] Practice Semgrep or SonarQube concepts.
+- [ ] Understand SCA and dependency scanning.
+- [ ] Learn CVE, CVSS, and SBOM concepts.
+- [ ] Practice Docker image scanning using Trivy.
+- [ ] Understand Terraform security scanning using Checkov.
+- [ ] Learn Falco runtime security concepts.
+- [ ] Understand security gates in CI/CD.
+- [ ] Review GitLab pipeline security integration.
+- [ ] Practice DevSecOps troubleshooting scenarios.
+- [ ] Revise SRE and DevSecOps interview questions.
+
+## Important Notes
+
+1. DevSecOps integrates security into every stage of the software development lifecycle.
+2. Shift-Left Security helps identify vulnerabilities early, before they reach production.
+3. SAST scans source code, while SCA identifies vulnerabilities in third-party dependencies.
+4. Container scanning helps identify vulnerable packages and insecure image configurations.
+5. Terraform scanning identifies infrastructure misconfigurations before provisioning.
+6. Falco provides runtime security monitoring for suspicious system and container activity.
+7. Security gates help prevent deployments that violate defined security policies.
+8. Not every scanner finding is automatically exploitable; review severity, context, and applicability.
+9. Never hardcode passwords, API keys, or cloud credentials in source code or pipeline files.
+10. Use least-privilege IAM permissions and secure CI/CD variables or secret-management integrations.
+11. Keep security tools and scanning rules updated.
+12. Security is a shared responsibility across developers, DevOps, SRE, and security teams.
