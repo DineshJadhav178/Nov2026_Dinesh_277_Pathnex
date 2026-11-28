@@ -1,0 +1,61 @@
+# Day 20 – Site Reliability Engineering (SRE) – Production Troubleshooting and Monitoring
+
+## What I did today:
+
+1. **SRE Fundamentals and Reliability Principles (1 Hour)**
+   - Studied the role and responsibilities of an SRE in production environments.
+   - Understood the importance of system reliability, availability, scalability, and performance.
+   - Learned SLI, SLO, SLA, and Error Budget concepts.
+   - Understood how Error Budgets help balance service reliability with deployment and innovation.
+   - Studied toil and why repetitive manual operational tasks should be automated.
+
+2. **Incident Management and Root Cause Analysis (1 Hour)**
+   - Learned the incident management lifecycle: detection, response, mitigation, recovery, and review.
+   - Studied P1, P2, P3, and P4 incident classification.
+   - Understood on-call responsibilities, escalation procedures, and incident communication.
+   - Learned Root Cause Analysis using the Five Whys technique.
+   - Understood blameless postmortems and how corrective actions prevent recurring incidents.
+
+3. **Linux and System Troubleshooting (1 Hour)**
+   - Practiced identifying CPU, memory, disk, and process-related issues in Linux.
+   - Reviewed commands such as `top`, `free`, `df`, `du`, `ps`, and `journalctl`.
+   - Studied Linux system logs and application log analysis.
+   - Learned basic network troubleshooting using `ping`, `curl`, `ss`, `traceroute`, and `nslookup`.
+   - Understood how Shell scripting can automate repetitive operational checks.
+
+4. **Monitoring, Observability, and Alerting (1 Hour)**
+   - Studied the three pillars of observability: metrics, logs, and traces.
+   - Learned Prometheus architecture and its role in metrics collection.
+   - Explored Grafana dashboards for infrastructure and application monitoring.
+   - Understood Alertmanager and alert routing concepts.
+   - Reviewed important monitoring metrics such as CPU, memory, disk, latency, request rate, and error rate.
+   - Studied how to reduce alert noise through meaningful thresholds and actionable alerts.
+
+5. **Application, Kubernetes, and Cloud Troubleshooting (1 Hour)**
+   - Studied troubleshooting approaches for application downtime and HTTP 500, 502, 503, and 504 errors.
+   - Reviewed Java application and JVM memory troubleshooting concepts.
+   - Learned how to investigate database connectivity and application timeout issues.
+   - Revised Kubernetes pod troubleshooting, including CrashLoopBackOff and ImagePullBackOff.
+   - Reviewed Kubernetes networking, DNS, container logs, and resource utilization.
+   - Studied AWS infrastructure monitoring, EC2 connectivity, load balancing, and Auto Scaling concepts.
+
+6. **Automation, Production Operations, and Capacity Planning (1 Hour)**
+   - Studied operational automation using Shell scripting and Python.
+   - Reviewed Jenkins CI/CD, Ansible, automated health checks, and self-healing concepts.
+   - Learned Kafka consumer lag and distributed application troubleshooting fundamentals.
+   - Understood capacity planning based on traffic patterns and resource utilization.
+   - Studied hard freezes and cold freezes as change-management practices.
+   - Reviewed production incident reporting, escalation, postmortems, and permanent corrective actions.
+
+## Tomorrow's Tasks:
+
+1. Practice Linux CPU, memory, disk, and network troubleshooting.
+2. Calculate Error Budgets using different SLO targets.
+3. Create a basic Prometheus and Grafana monitoring setup.
+4. Configure basic application and infrastructure alerts.
+5. Practice troubleshooting HTTP 500, 502, 503, and 504 errors.
+6. Revise Kubernetes pod and node troubleshooting commands.
+7. Write a Shell or Python script for automated health checks.
+8. Practice P1/P2 incident scenarios and Five Whys RCA.
+9. Understand Kafka consumer lag and database connectivity troubleshooting.
+10. Prepare practical SRE interview questions and production incident explanations.
