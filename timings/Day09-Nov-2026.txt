@@ -1,4 +1,4 @@
-# Day 09 – Amazon EKS Cluster Upgrade Session Timing Log
+ # Day 09 – Amazon EKS Cluster Upgrade Session Timing Log
 
 ## What I Studied Today
 
