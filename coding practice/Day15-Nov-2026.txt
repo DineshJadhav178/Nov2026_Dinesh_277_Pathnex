@@ -1,0 +1,506 @@
+# Day 11 – AWS Hands-on Practice | Auto Scaling, Lambda & Security Services
+
+## 1. AWS Auto Scaling Groups (ASG)
+
+### Understand Auto Scaling Fundamentals
+
+Learn the following concepts:
+
+- Horizontal scaling.
+- Vertical scaling.
+- Scale out.
+- Scale in.
+- Auto Scaling Groups.
+- Launch Templates.
+- Minimum capacity.
+- Maximum capacity.
+- Desired capacity.
+- Health checks.
+- Availability Zone distribution.
+
+### Practical Exercises
+
+1. Open the Amazon EC2 console.
+2. Create a Launch Template.
+3. Select an Amazon Machine Image (AMI).
+4. Configure an EC2 instance type.
+5. Configure Security Groups.
+6. Create an Auto Scaling Group.
+7. Select minimum, maximum and desired capacity.
+8. Configure multiple Availability Zones.
+9. Attach a Load Balancer if available.
+10. Explore instance health checks.
+
+### Practice AWS CLI Commands
+
+```bash
+# List Auto Scaling Groups
+aws autoscaling describe-auto-scaling-groups
+
+# List Launch Templates
+aws ec2 describe-launch-templates
+
+# Describe scaling policies
+aws autoscaling describe-policies
+
+# Check scaling activities
+aws autoscaling describe-scaling-activities
+
+# Update desired capacity
+aws autoscaling set-desired-capacity \
+  --auto-scaling-group-name my-asg \
+  --desired-capacity 3
+
+# Update minimum and maximum capacity
+aws autoscaling update-auto-scaling-group \
+  --auto-scaling-group-name my-asg \
+  --min-size 1 \
+  --max-size 5
+```
+
+### Practice Tasks
+
+1. Create an Auto Scaling Group with two EC2 instances.
+2. Increase desired capacity from 2 to 3.
+3. Observe how a new EC2 instance launches.
+4. Decrease desired capacity from 3 to 2.
+5. Observe how an instance terminates.
+6. Explore instance replacement after an unhealthy health check.
+7. Understand how an ASG maintains desired capacity.
+
+## 2. Amazon CloudWatch – Monitoring and Scaling
+
+### Key Concepts
+
+Understand:
+
+- CloudWatch Metrics.
+- CloudWatch Alarms.
+- CPU Utilization.
+- Memory Utilization and custom metrics.
+- Scaling Policies.
+- Target Tracking Scaling.
+- Step Scaling.
+- Simple Scaling.
+- Alarm States: OK, ALARM and INSUFFICIENT_DATA.
+
+### Practical Exercises
+
+1. Open Amazon CloudWatch.
+2. Navigate to Metrics.
+3. Explore EC2 instance metrics.
+4. Check CPU utilization.
+5. Create a CloudWatch alarm.
+6. Configure a CPU utilization threshold.
+7. Understand alarm evaluation periods.
+8. Explore how CloudWatch alarms trigger Auto Scaling policies.
+
+### Example Scaling Scenario
+
+```text
+Condition:
+Average CPU Utilization > 70%
+
+Action:
+Increase Auto Scaling Group capacity.
+
+Condition:
+Average CPU Utilization < 30%
+
+Action:
+Decrease Auto Scaling Group capacity.
+```
+
+### Practice Scenarios
+
+1. EC2 CPU utilization continuously exceeds 90%. How would you investigate?
+2. CloudWatch alarm is in ALARM state, but no scaling action occurs. What would you check?
+3. How does target tracking scaling work?
+4. What is the difference between scale out and scale in?
+5. How would you troubleshoot an Auto Scaling Group that is not launching instances?
+
+## 3. AWS Lambda – Serverless Computing
+
+### Understand Lambda Fundamentals
+
+Learn:
+
+- Serverless computing.
+- Function as a Service (FaaS).
+- Event-driven architecture.
+- Lambda execution role.
+- Lambda triggers.
+- Lambda destinations.
+- Function timeout.
+- Memory configuration.
+- Execution logs.
+- Lambda concurrency.
+
+### Practical Exercise 1 – Create a Lambda Function
+
+1. Open the AWS Lambda console.
+2. Select Create Function.
+3. Choose Author from Scratch.
+4. Enter function name: `day11-lambda-function`.
+5. Select Python as the runtime.
+6. Create the function.
+7. Add the following code.
+8. Deploy and test the function.
+9. Check the execution result.
+
+### Python Lambda Example
+
+```python
+import json
+
+def lambda_handler(event, context):
+
+    print("AWS Lambda function executed successfully")
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "message": "Welcome to Day 11 AWS Practice"
+        })
+    }
+```
+
+### Practical Exercise 2 – S3 Trigger with Lambda
+
+Understand the following workflow:
+
+```text
+User uploads file to S3
+          |
+          v
+    S3 Event Notification
+          |
+          v
+     AWS Lambda
+          |
+          v
+   Process uploaded file
+          |
+          v
+  CloudWatch Logs
+```
+
+Practice tasks:
+
+1. Create an S3 bucket.
+2. Create a Lambda function.
+3. Configure an S3 event notification.
+4. Select the ObjectCreated event.
+5. Configure the Lambda function as the destination.
+6. Upload a test file to S3.
+7. Verify that Lambda executes.
+8. Check the execution logs in CloudWatch.
+
+### Lambda Troubleshooting Scenarios
+
+1. Lambda function execution fails. How would you troubleshoot it?
+2. Lambda is triggered, but the S3 object cannot be accessed. What permissions would you check?
+3. Lambda execution exceeds the configured timeout. What would you investigate?
+4. Lambda function is unable to write logs to CloudWatch. Which IAM permissions are required?
+5. What is the difference between a Lambda trigger and a destination?
+
+## 4. IAM Roles and Policies for Lambda
+
+### Understand IAM Fundamentals
+
+Learn:
+
+- IAM Users.
+- IAM Groups.
+- IAM Roles.
+- IAM Policies.
+- Trust Relationships.
+- Identity-based policies.
+- Resource-based policies.
+- Least-privilege access.
+
+### Practical Tasks
+
+1. Open the IAM console.
+2. Explore existing IAM roles.
+3. Understand Lambda execution roles.
+4. Create or inspect an execution role for Lambda.
+5. Attach the appropriate CloudWatch Logs permissions.
+6. Understand the AWS-managed policy `AWSLambdaBasicExecutionRole`.
+7. Explore the trust relationship allowing Lambda to assume the role.
+8. Understand how Lambda accesses S3 through IAM permissions.
+
+### Important IAM Concepts
+
+**Trust Policy:** Defines which principal is allowed to assume an IAM role.
+
+**Permissions Policy:** Defines which AWS actions the role can perform on specific resources.
+
+**Least Privilege:** Grant only the permissions required for the application.
+
+### Practice Scenarios
+
+1. Lambda cannot access an S3 bucket. How would you troubleshoot the IAM role?
+2. Lambda is unable to create CloudWatch Logs. Which permissions are required?
+3. What is the difference between an IAM role and an IAM policy?
+4. What is the difference between a trust policy and a permissions policy?
+
+## 5. AWS Shield – DDoS Protection
+
+### Understand AWS Shield
+
+Learn:
+
+- Distributed Denial of Service (DDoS).
+- AWS Shield Standard.
+- AWS Shield Advanced.
+- Network-layer attacks.
+- Transport-layer attacks.
+- Application-layer attacks.
+- Protected AWS resources.
+
+### Key Concepts
+
+**Shield Standard:**
+- Automatically provides baseline DDoS protection.
+- Available without an additional Shield subscription charge.
+
+**Shield Advanced:**
+- Provides enhanced DDoS protection.
+- Offers additional detection, visibility and response capabilities.
+- Has additional charges and eligibility requirements.
+
+### Practical Tasks
+
+1. Open the AWS Shield console.
+2. Understand Shield Standard protection.
+3. Explore Shield Advanced features.
+4. Understand supported resources such as CloudFront, Route 53 and Application Load Balancers.
+5. Understand how DDoS protection integrates with AWS infrastructure.
+
+### Practice Scenarios
+
+1. What is a DDoS attack?
+2. What is the difference between Shield Standard and Shield Advanced?
+3. How does AWS Shield protect an application?
+4. Which AWS services can be protected using Shield?
+
+## 6. AWS WAF – Web Application Firewall
+
+### Understand AWS WAF
+
+Learn:
+
+- Web Application Firewall.
+- Web ACLs.
+- Rule Groups.
+- IP-based rules.
+- Geo-based rules.
+- Rate-based rules.
+- SQL Injection protection.
+- Cross-Site Scripting (XSS).
+- CAPTCHA and Challenge actions.
+
+### Practical Exercises
+
+1. Open the AWS WAF console.
+2. Explore Web ACLs.
+3. Understand rule groups.
+4. Explore AWS Managed Rules.
+5. Understand IP address filtering.
+6. Explore geo-based filtering.
+7. Understand rate-based rules.
+8. Learn how WAF can protect supported resources such as CloudFront distributions and Application Load Balancers.
+
+### Example WAF Rules
+
+```text
+Rule 1:
+Block traffic from a specified IP address.
+
+Rule 2:
+Block traffic from selected countries.
+
+Rule 3:
+Apply rate-based protection when a client
+exceeds the configured request threshold.
+
+Rule 4:
+Use managed rules to detect common
+SQL injection and XSS attack patterns.
+```
+
+### Important Security Concepts
+
+**SQL Injection:**
+An attacker attempts to manipulate database queries through malicious input.
+
+Prevention:
+- Parameterized queries.
+- Prepared statements.
+- Input validation.
+
+**Cross-Site Scripting (XSS):**
+An attacker injects malicious scripts that execute in a user's browser.
+
+Prevention:
+- Output encoding.
+- Input validation.
+- Content Security Policy.
+
+### Practice Scenarios
+
+1. Application receives an unusually high number of HTTP requests. How would you protect it?
+2. How would you block traffic from a specific IP address?
+3. What is the difference between AWS Shield and AWS WAF?
+4. How does a rate-based WAF rule work?
+5. What is the difference between SQL injection and XSS?
+
+## 7. Amazon GuardDuty – Threat Detection
+
+### Understand GuardDuty
+
+Learn:
+
+- Threat detection.
+- Security findings.
+- Machine learning-based anomaly detection.
+- Threat intelligence.
+- Suspicious API activity.
+- Unauthorized access.
+- Potential data exfiltration.
+- EventBridge integration.
+
+### Practical Exercises
+
+1. Open Amazon GuardDuty.
+2. Understand how the service is enabled.
+3. Explore sample findings where available.
+4. Review finding severity.
+5. Understand finding types.
+6. Investigate suspicious API activity.
+7. Explore EventBridge integration.
+8. Understand automated incident response workflows.
+
+### Example Security Workflow
+
+```text
+Suspicious AWS Activity
+          |
+          v
+     Amazon GuardDuty
+          |
+          v
+     Security Finding
+          |
+          v
+      EventBridge
+          |
+          v
+  Automated Response
+          |
+          v
+ Notification / Investigation
+```
+
+### Practice Scenarios
+
+1. GuardDuty detects suspicious API activity. What would you investigate?
+2. How would you identify potentially compromised credentials?
+3. Can GuardDuty directly block malicious network traffic?
+4. How can EventBridge help automate a response to GuardDuty findings?
+5. What is the difference between GuardDuty and CloudTrail?
+
+## 8. Amazon Inspector – Vulnerability Management
+
+### Understand Inspector
+
+Learn:
+
+- Vulnerability assessment.
+- Common Vulnerabilities and Exposures (CVE).
+- Common Vulnerability Scoring System (CVSS).
+- Severity ratings.
+- EC2 vulnerability scanning.
+- Container image scanning.
+- Lambda vulnerability assessment.
+- Remediation recommendations.
+
+### Practical Exercises
+
+1. Open Amazon Inspector.
+2. Explore supported resource coverage.
+3. Understand EC2 vulnerability scanning.
+4. Explore container image scanning in Amazon ECR.
+5. Review CVE findings.
+6. Understand critical, high, medium and low severity levels.
+7. Explore remediation recommendations.
+8. Understand EventBridge integration.
+
+### Practice Scenarios
+
+1. Inspector identifies a critical CVE on an EC2 instance. What would you do?
+2. How would you prioritize vulnerability remediation?
+3. What is the difference between Inspector and GuardDuty?
+4. How does Inspector help identify vulnerable software packages?
+5. How would you track vulnerability remediation?
+
+## 9. AWS Security Services – Quick Comparison
+
+| AWS Service | Primary Purpose |
+|---|---|
+| AWS Shield | DDoS protection |
+| AWS WAF | Web application and API traffic filtering |
+| GuardDuty | Threat detection |
+| Inspector | Vulnerability assessment |
+| CloudTrail | AWS API activity auditing |
+| CloudWatch | Monitoring, metrics and alarms |
+| IAM | Identity and access management |
+
+### Real-Time SRE/DevOps Scenarios
+
+1. Application is receiving a DDoS attack. Which AWS service would you use?
+2. Malicious HTTP requests are targeting an application. How would you use AWS WAF?
+3. GuardDuty reports suspicious activity from an IAM identity. What steps would you take?
+4. Inspector reports vulnerable packages on EC2 instances. How would you remediate them?
+5. CloudWatch reports high CPU utilization. How would you investigate and scale the application?
+6. Lambda function is failing because of insufficient IAM permissions. How would you troubleshoot it?
+7. An Auto Scaling Group continuously launches and terminates instances. How would you investigate?
+8. An S3 upload event is not triggering Lambda. What would you check?
+9. A Lambda function executes successfully but no logs appear in CloudWatch. What could be the reason?
+10. How would you design an automated response workflow for a critical GuardDuty finding?
+
+## 10. AWS Interview Preparation
+
+Prepare answers for the following questions:
+
+1. What is AWS Auto Scaling?
+2. What is the difference between scale out and scale in?
+3. What is an Auto Scaling Group?
+4. How does CloudWatch integrate with Auto Scaling?
+5. What is serverless computing?
+6. What is AWS Lambda?
+7. What is the difference between a Lambda trigger and destination?
+8. What is a Lambda execution role?
+9. How does Lambda integrate with S3?
+10. What is the difference between AWS Shield and AWS WAF?
+11. What are Web ACLs and rule groups?
+12. What is a rate-based rule in AWS WAF?
+13. What is SQL injection?
+14. What is Cross-Site Scripting?
+15. What is Amazon GuardDuty?
+16. What is Amazon Inspector?
+17. What is a CVE?
+18. What is the difference between GuardDuty and Inspector?
+19. How can EventBridge automate security responses?
+20. How would you investigate a critical AWS security finding?
+
+## 11. Daily Completion Checklist
+
+- [ ] Understood AWS Auto Scaling fundamentals.
+- [ ] Created and explored an Auto Scaling Group.
+- [ ] Practiced scale-out and scale-in operations.
+- [ ] Explored CloudWatch metrics and alarms.
+- [ ] Created and tested a Lambda function.
+- [ ] Understood S3 event notifications and Lambda integration.
+- [ ] Practiced IAM execution roles
